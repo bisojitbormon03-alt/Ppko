@@ -1,0 +1,43 @@
+.shop-filter{
+  flex-shrink:0;
+  z-index:90;
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:stretch;
+  margin:10px 12px;
+  background:linear-gradient(180deg,var(--theme),var(--theme-soft));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  box-shadow:0 6px 18px -12px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden
+}
+
+.filter-btn{
+  appearance:none;
+  flex:1 1 0;
+  min-width:0;
+  min-height:40px;
+  border:none;
+  border-radius:12px;
+  background:transparent;
+  color:var(--text-soft);
+  font-family:inherit;
+  font-size:15.5px;
+  font-weight:700;
+  letter-spacing:.3px;
+  padding:12px 10px;
+  cursor:pointer;
+  touch-action:manipulation;
+  user-select:none;
+  transition:background .18s,color .18s,box-shadow .18s,transform .12s
+}
+
+.filter-btn:active{
+  transform:scale(.96)
+}
+
+.filter-btn.active{
+  background:linear-gradient(180deg,#8ADFFF,#64D2FA);
+  color:#0756B8;
+  box-shadow:0 4px 14px -6px rgba(100,210,250,.55),inset 0 1px 0 rgba(255,255,255,.55)
+}
