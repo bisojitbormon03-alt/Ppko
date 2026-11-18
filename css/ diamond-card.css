@@ -1,0 +1,237 @@
+/* =========================================================
+   DIAMOND CARDS - FIXED LAYOUT
+   Fixed width: 340px
+   Fixed height: 112px
+   No responsive resizing.
+
+   Note: the @keyframes btnSpin animation used by
+   .diamond-card-spinner is defined in shop.html's <style>
+   (shared with the Power and Skin buttons).
+   ========================================================= */
+
+:root{
+  --diamond-card-width:340px;
+  --diamond-card-height:112px;
+}
+
+.shop-grid{
+  display:grid;
+  grid-template-columns:var(--diamond-card-width);
+  justify-content:center;
+  align-items:start;
+  gap:12px;
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:2px 2px 8px;
+  margin:0;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+
+.shop-grid::-webkit-scrollbar{
+  display:none;
+}
+
+.diamond-card{
+  position:relative;
+  display:grid;
+  grid-template-columns:96px minmax(0,1fr);
+  grid-template-rows:1fr 36px;
+  column-gap:14px;
+  row-gap:6px;
+  align-items:stretch;
+  width:var(--diamond-card-width);
+  min-width:var(--diamond-card-width);
+  max-width:var(--diamond-card-width);
+  height:var(--diamond-card-height);
+  min-height:var(--diamond-card-height);
+  max-height:var(--diamond-card-height);
+  padding:12px 14px;
+  flex-shrink:0;
+  background:linear-gradient(180deg,var(--theme-soft),var(--theme));
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:0 8px 20px -14px rgba(0,0,0,.85);
+  transition:border-color .2s,transform .15s;
+}
+
+.diamond-card:active{
+  transform:scale(.985);
+}
+
+.diamond-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+  pointer-events:none;
+}
+
+.diamond-card-image-wrap{
+  grid-column:1;
+  grid-row:1 / span 2;
+  width:96px;
+  min-width:96px;
+  max-width:96px;
+  height:100%;
+  min-height:0;
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:none;
+  border:none;
+  box-shadow:none;
+  border-radius:0;
+  overflow:visible;
+}
+
+.diamond-card-image{
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:center;
+  background:none;
+  border:none;
+  box-shadow:none;
+  border-radius:0;
+  filter:none;
+  margin:0;
+  padding:0;
+  flex-shrink:0;
+}
+
+.diamond-card-image.is-failed{
+  visibility:hidden;
+}
+
+.diamond-card-content{
+  grid-column:2;
+  grid-row:1;
+  align-self:center;
+  justify-content:center;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  overflow:hidden;
+}
+
+.diamond-card-amount{
+  margin:0;
+  padding:0;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.diamond-card-label{
+  color:var(--text-soft);
+  font-size:11px;
+  font-weight:600;
+  line-height:1.2;
+}
+
+.diamond-card-action{
+  grid-column:2;
+  grid-row:2;
+  justify-self:end;
+  align-self:end;
+  width:96px;
+  min-width:96px;
+  max-width:96px;
+  height:36px;
+  display:flex;
+  justify-content:flex-end;
+  align-items:stretch;
+}
+
+.diamond-card-button{
+  width:100%;
+  height:36px;
+  min-height:36px;
+  max-height:36px;
+  padding:5px 6px;
+  border:none;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  color:#14243A;
+  background:linear-gradient(180deg,#FFE27A,var(--gold));
+  box-shadow:0 6px 18px -8px var(--gold-glow),inset 0 1px 0 rgba(255,255,255,.45);
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:.3px;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:transform .12s,filter .15s,opacity .2s;
+}
+
+.diamond-card-button:active:not(:disabled){
+  transform:scale(.96);
+  filter:brightness(1.05);
+}
+
+.diamond-card-button:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+}
+
+.diamond-card-button:disabled{
+  cursor:not-allowed;
+  opacity:.6;
+  color:var(--text-soft);
+  background:var(--theme-deeper);
+  box-shadow:none;
+}
+
+.diamond-card-button.is-loading{
+  pointer-events:none;
+  cursor:wait;
+  opacity:.78;
+}
+
+.diamond-card-price-icon{
+  width:25px;
+  height:25px;
+  display:inline-block;
+  flex:0 0 20px;
+  object-fit:contain;
+}
+
+.diamond-card-spinner{
+  width:20px;
+  height:20px;
+  flex:0 0 16px;
+  border:2px solid rgba(255,255,255,.28);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:btnSpin .65s linear infinite;
+}
+
+/* REDUCED MOTION - Diamond Card only */
+
+@media(prefers-reduced-motion:reduce){
+
+  .diamond-card,
+  .diamond-card-button{
+    transition:none;
+  }
+
+  .diamond-card-spinner{
+    animation-duration:1.5s;
+  }
+}
