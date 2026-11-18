@@ -1,0 +1,4363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Archery Game</title>
+
+    <link rel="stylesheet" href="css/game/coin-diamond.css">
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --theme: #213C5E;   --theme-deep: #16293F;  --theme-deeper: #0F1E30;  --theme-soft: #2C4E76;    --theme-softer: #35597F;  --bg: var(--theme-deeper);            --surface: var(--theme-deep);            --surface-alt: var(--theme);            --surface-elevated: var(--theme-soft);
+            --surface-highlight: var(--theme-softer);
+            --border: var(--theme-soft);
+            --border-strong: var(--theme-softer);
+            --text: #F1F5F9;
+            --text-sub: #B8C7D9;
+            --accent: var(--theme-soft);
+            --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.30);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.55);
+            --hud-purple: #A1A2A6;
+            --overlay-bg: rgba(15, 30, 48, 0.72);
+            --block-border: rgba(53, 89, 127, 0.55);
+            --block-empty-bg: var(--theme-deep);
+            --block-empty-border: rgba(53, 89, 127, 0.35);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            background-image: url("picture_resource/background2.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--theme-deeper);
+            background-image: url("picture_resource/background2.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.55);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            will-change: transform, opacity;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        .app.slide-out {
+            transform: translate3d(100%, 0, 0);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn-home {
+            position: absolute;
+            top: calc(6px + env(safe-area-inset-top, 0px));
+            left: 12px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease-out;
+            touch-action: manipulation;
+            padding: 0;
+            will-change: transform;
+        }
+
+        .btn-home:hover {
+            background: rgba(53, 89, 127, 0.35);
+        }
+
+        .btn-home:active {
+            background: rgba(44, 78, 118, 0.55);
+            transform: scale(0.94);
+        }
+
+        .btn-home:focus-visible {
+            box-shadow: 0 0 0 2px var(--theme-softer);
+            outline: none;
+        }
+
+        .btn-home.pressed {
+            transform: scale(0.95);
+        }
+
+        .btn-home img {
+            width: 42px;
+            height: 42px;
+            display: block;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .header-timer,
+        .time-icon,
+        .time-value {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        .game-area-wrap {
+            flex: 1;
+            padding: 100px 10px 84px 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: transparent;
+            min-height: 0;
+            touch-action: none;
+            position: relative;
+        }
+
+        .board-container {
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+            border: none;
+            background: var(--theme-deep);
+        }
+
+        #gameArea {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            background-color: var(--theme-deep);
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+            border: none;
+        }
+
+        #animationLayer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 100;
+            border-radius: 0;
+        }
+
+        /* Full preview: uses the normalized square image as a real <img>,
+           not a CSS background. */
+        #fullImagePreview {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            pointer-events: none;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        #fullImagePreview img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Loading / error status shown over the board */
+        .board-status {
+            position: absolute;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--theme-deep);
+        }
+
+        .board-status.active {
+            display: flex;
+        }
+
+        .board-status.error {
+            cursor: pointer;
+        }
+
+        .view-mode-active .game-block {
+            visibility: hidden !important;
+        }
+
+        .view-mode-active #animationLayer {
+            visibility: hidden !important;
+        }
+
+        .view-mode-active #fullImagePreview {
+            display: block !important;
+        }
+
+        .game-block {
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--block-border);
+            will-change: transform;
+            backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+            cursor: pointer;
+            touch-action: none;
+            z-index: 1;
+            background-color: transparent;
+            transition: none;
+            aspect-ratio: 1 / 1;
+        }
+
+        /* Each tile owns its own image file (blob URL of tile-NN) */
+        .game-block > img.tile-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .game-block.empty-block {
+            background: var(--block-empty-bg);
+            border-color: var(--block-empty-border);
+            cursor: default;
+            z-index: 0;
+        }
+
+        .game-block.tappable:active {
+            background-color: rgba(44, 78, 118, 0.45);
+        }
+
+        .game-block.clone-block {
+            position: absolute;
+            margin: 0;
+            pointer-events: none;
+            z-index: 100;
+            transition: transform 200ms ease-out;
+            will-change: transform;
+            backface-visibility: hidden;
+            border: 1px solid var(--block-border);
+            aspect-ratio: 1 / 1;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: calc(100% - 32px);
+            max-width: 300px;
+            height: 64px;
+            padding: 0 8px;
+            background: var(--theme-deep);
+            border: 1px solid var(--theme-soft);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+            z-index: 30;
+            pointer-events: auto;
+            gap: 25px;
+        }
+
+        .nav-btn {
+            position: relative;
+            flex: 1 1 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            border: 1px solid var(--theme-soft);
+            background: transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease,
+                transform 0.1s ease-out;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            touch-action: manipulation;
+            box-shadow: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(53, 89, 127, 0.35);
+            border-color: var(--theme-softer);
+        }
+
+        .nav-btn:active {
+            background: rgba(44, 78, 118, 0.55);
+            border-color: var(--theme-softer);
+            transform: scale(0.94);
+        }
+
+        .nav-btn:focus-visible {
+            box-shadow: 0 0 0 2px var(--theme-softer);
+            border-color: var(--theme-softer);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
+
+        .nav-btn img {
+            width: 32px;
+            height: 32px;
+            display: block;
+            object-fit: contain;
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+
+        .nav-btn.placeholder {
+            cursor: default;
+        }
+
+        .nav-btn::before,
+        .nav-btn::after {
+            display: none;
+        }
+
+        /* Power availability dot: green when quantity > 0, hidden at 0.
+           Never shows a number. */
+        .usage-count {
+            position: absolute;
+            right: -4px;
+            bottom: -4px;
+            width: 11px;
+            height: 11px;
+            padding: 0;
+            display: none;
+            background: #2e9e4f;
+            font-size: 0;
+            line-height: 0;
+            color: transparent;
+            overflow: hidden;
+            border-radius: 50%;
+            border: 1px solid rgba(15, 30, 48, 0.9);
+            z-index: 35;
+            pointer-events: none;
+        }
+
+        .usage-count.has-power {
+            display: block;
+        }
+
+        .reward-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--overlay-bg);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .reward-overlay.active {
+            display: flex;
+        }
+
+        .reward-popup {
+            position: relative;
+            display: inline-block;
+            max-width: 110vw;
+            width: auto;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            text-align: initial;
+            line-height: 0;
+            font-size: 0;
+        }
+
+        .reward-popup .popup-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .popup-image-btn {
+            position: absolute;
+            display: block;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: transparent;
+            box-shadow: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            appearance: none;
+            -webkit-appearance: none;
+            opacity: 1;
+            z-index: 5;
+        }
+
+        .popup-image-btn:hover,
+        .popup-image-btn:focus,
+        .popup-image-btn:active {
+            background: transparent;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            color: transparent;
+            filter: none;
+            transform: none;
+        }
+
+        .popup-image-btn.coin-button {
+            left: 15%;
+            top: 61%;
+            width: 71%;
+            height: 11%;
+        }
+
+        .popup-image-btn.continue-button {
+            right: 13%;
+            top: 73%;
+            width: 73%;
+            height: 11%;
+        }
+
+        .app,
+        .game-area-wrap,
+        #gameArea {
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app" role="application" aria-label="Archery Game">
+
+    <button class="btn-home" aria-label="Home" id="homeBtn" type="button">
+        <img src="picture_resource/icon/home.png" alt="Home">
+    </button>
+
+    <div class="coin-hud" aria-label="Coin count">
+        <div class="hud-item">
+            <img src="picture_resource/icon/coin.png" alt="" class="hud-icon">
+            <div class="hud-bar">
+                <span class="hud-value" id="coinDisplay">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="diamond-hud" aria-label="Diamond count">
+        <div class="hud-item">
+            <img src="picture_resource/icon/dimon.png" alt="" class="hud-icon">
+            <div class="hud-bar">
+                <span class="hud-value" id="diamondDisplay">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-area-wrap">
+
+        <div class="board-container">
+            <main id="gameArea" role="main" aria-label="Game world"></main>
+            <div id="animationLayer"></div>
+            <div id="fullImagePreview"></div>
+            <div id="boardStatus" class="board-status" role="status" aria-live="polite"></div>
+        </div>
+
+        <nav class="bottom-nav" aria-label="Bottom navigation">
+
+            <button class="nav-btn view-btn" type="button" aria-label="Show full image preview">
+                <img src="picture_resource/icon/off_view.png" alt="" class="view-icon">
+                <span class="usage-count" id="usageView" aria-hidden="true"></span>
+            </button>
+
+            <button class="nav-btn reset-btn" type="button" aria-label="Reset">
+                <img src="picture_resource/icon/reset.png" alt="">
+                <span class="usage-count" id="usageReset" aria-hidden="true"></span>
+            </button>
+
+            <button class="nav-btn replay-btn" type="button" aria-label="Replay">
+                <img src="picture_resource/icon/replay.png" alt="">
+                <span class="usage-count" id="usageReplay" aria-hidden="true"></span>
+            </button>
+
+            <button class="nav-btn idea-btn" type="button" aria-label="Idea">
+                <img src="picture_resource/icon/idea_icon.png" alt="">
+                <span class="usage-count" id="usageIdea" aria-hidden="true"></span>
+            </button>
+
+        </nav>
+
+        <div class="reward-overlay" id="rewardOverlay">
+
+            <div class="reward-popup">
+
+                <img src="picture_resource/icon/popup.png" class="popup-image" alt="">
+
+                <button class="popup-image-btn coin-button" id="rewardClaimBtn" type="button" aria-label="Take Coins"></button>
+
+                <button class="popup-image-btn continue-button" id="continueBtn" type="button" aria-label="Continue"></button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =====================================================================
+     FIREBASE MODULE — LocalStorage-first data system
+
+     LocalStorage key: "userDatakv9688658vs"
+         { coin, diamond, power: { reset, idea, replay, preview }, picture? }
+
+     Page load:
+       1. LocalStorage is read first and the UI is updated immediately.
+       2. After auth resolves, Firebase is read ONCE (user document +
+          power document, in parallel). The result replaces LocalStorage
+          and the UI. No listeners, no polling, no repeated reads.
+
+     Power use:
+       - Handled locally by the game script (LocalStorage + UI + action).
+       - Afterwards the new power values are written to Firebase in the
+         background (window.__firebasePower.syncPower). Failures are silent.
+
+     Coin:     Firestore read, backend writes (POST /api/coin)
+     Diamond:  Firestore read, backend writes
+     Power:    users/{uid}/power/power4  ->  power.reset/idea/replay/preview
+     ===================================================================== -->
+
+<script type="module">
+
+    import { auth, db } from "./firebase.js";
+
+    import {
+        doc,
+        getDoc,
+        updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+    import {
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+    const USER_DATA_KEY = 'userDatakv9688658vs';
+
+    const BACKEND_URL = 'https://my-life-backend-1.onrender.com';
+
+    const POWER_DOCUMENT_ID = 'power4';
+
+    const POWER_FIELDS = ['reset', 'idea', 'replay', 'preview'];
+
+
+    let userUid = null;
+    let rewardClaimInProgress = false;
+
+    // Firebase is read exactly once per page load.
+    let initialReadStarted = false;
+
+    // True once a power was consumed locally during this page session.
+    // Used so a slow initial read can never resurrect a consumed power.
+    let powerChangedLocally = false;
+
+    // Latest power values that could not be written yet (auth not ready).
+    let pendingPowerWrite = null;
+
+
+    // ================================================================
+    // localStorage helpers
+    // ================================================================
+
+    function getUserData() {
+        try {
+            const raw = localStorage.getItem(USER_DATA_KEY);
+            if (!raw) return {};
+            const parsed = JSON.parse(raw);
+            return (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+                ? parsed
+                : {};
+        } catch (e) {
+            console.warn('Failed to read user data from localStorage:', e);
+            return {};
+        }
+    }
+
+
+    function saveUserData(data) {
+        try {
+            const safe = (data && typeof data === 'object') ? data : {};
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(safe));
+        } catch (e) {
+            console.warn('Failed to save user data to localStorage:', e);
+        }
+    }
+
+
+    function getLocalCoin() {
+        const data = getUserData();
+        return (typeof data.coin === 'number' && Number.isFinite(data.coin))
+            ? Math.max(0, Math.floor(data.coin))
+            : 0;
+    }
+
+
+    function saveCoinToLocalStorage(coin) {
+        const safeCoin = (typeof coin === 'number' && Number.isFinite(coin))
+            ? Math.max(0, Math.floor(coin))
+            : 0;
+        const data = getUserData();
+        data.coin = safeCoin;
+        saveUserData(data);
+    }
+
+
+    function getLocalDiamond() {
+        const data = getUserData();
+        return (typeof data.diamond === 'number' && Number.isFinite(data.diamond))
+            ? Math.max(0, Math.floor(data.diamond))
+            : 0;
+    }
+
+
+    function saveDiamondToLocalStorage(diamond) {
+        const safeDiamond = (typeof diamond === 'number' && Number.isFinite(diamond))
+            ? Math.max(0, Math.floor(diamond))
+            : 0;
+        const data = getUserData();
+        data.diamond = safeDiamond;
+        saveUserData(data);
+    }
+
+
+    function getLocalPicture() {
+        const data = getUserData();
+        return (typeof data.picture === 'string' && data.picture.trim())
+            ? data.picture
+            : null;
+    }
+
+
+    function normalizePowerValue(value) {
+        return (Number.isInteger(value) && value >= 0) ? value : 0;
+    }
+
+
+    function createEmptyPowerState() {
+        return { reset: 0, idea: 0, replay: 0, preview: 0 };
+    }
+
+
+    function normalizePowerObject(power) {
+        const src = (power && typeof power === 'object' && !Array.isArray(power))
+            ? power
+            : {};
+        return {
+            reset: normalizePowerValue(src.reset),
+            idea: normalizePowerValue(src.idea),
+            replay: normalizePowerValue(src.replay),
+            preview: normalizePowerValue(src.preview)
+        };
+    }
+
+
+    function getLocalPower() {
+        return normalizePowerObject(getUserData().power);
+    }
+
+
+    function savePowerToLocalStorage(power) {
+        const data = getUserData();
+        data.power = normalizePowerObject(power);
+        saveUserData(data);
+    }
+
+
+    window.__userdata = {
+        get: getUserData,
+        save: saveUserData,
+        getCoin: getLocalCoin,
+        saveCoin: saveCoinToLocalStorage,
+        getDiamond: getLocalDiamond,
+        saveDiamond: saveDiamondToLocalStorage,
+        getPicture: getLocalPicture,
+        getPower: getLocalPower,
+        savePower: savePowerToLocalStorage
+    };
+
+
+    // ================================================================
+    // APPLY DATA TO THE GAME (UI) + LOCALSTORAGE
+    // ================================================================
+
+    function applyPowerToGame(powerData) {
+
+        if (!window.__game) {
+            return;
+        }
+
+        const power = normalizePowerObject(powerData);
+
+        /*
+         * Update the EXISTING gamePower object in place.
+         * window.__game.power and gamePower must remain
+         * the same object reference.
+         */
+
+        const gamePowerObject =
+            window.__game.power &&
+            typeof window.__game.power === 'object' &&
+            !Array.isArray(window.__game.power)
+                ? window.__game.power
+                : {};
+
+        gamePowerObject.reset = power.reset;
+        gamePowerObject.idea = power.idea;
+        gamePowerObject.replay = power.replay;
+        gamePowerObject.preview = power.preview;
+
+        window.__game.power = gamePowerObject;
+
+        window.__game.updatePowerBadges();
+    }
+
+
+    // Coin + diamond values coming from the Firebase user document.
+    function applyBalancesFromData(data) {
+
+        if (!data || typeof data !== 'object' || !window.__game) {
+            return;
+        }
+
+        // COIN
+        if (typeof data.coin === 'number' && Number.isFinite(data.coin)) {
+            const safeCoin = Math.max(0, Math.floor(data.coin));
+            window.__game.state.coins = safeCoin;
+            window.__game.updateCoinDisplay();
+            saveCoinToLocalStorage(safeCoin);
+        }
+
+        // DIAMOND
+        if (typeof data.diamond === 'number' && Number.isFinite(data.diamond)) {
+            const safeDiamond = Math.max(0, Math.floor(data.diamond));
+            window.__game.state.diamonds = safeDiamond;
+            window.__game.updateDiamondDisplay();
+            saveDiamondToLocalStorage(safeDiamond);
+        }
+    }
+
+
+    // ================================================================
+    // FIREBASE READS
+    // ================================================================
+
+    async function readUserDocument(uid) {
+
+        if (!uid) {
+            throw new Error('No user UID provided.');
+        }
+
+        const userRef = doc(db, 'users', uid);
+
+        const snapshot = await getDoc(userRef);
+
+        if (!snapshot.exists()) {
+            throw new Error('User document does not exist.');
+        }
+
+        return snapshot.data();
+    }
+
+
+    async function readInitialUserData(uid) {
+
+        try {
+
+            const data = await readUserDocument(uid);
+
+            applyBalancesFromData(data);
+
+        } catch (err) {
+
+            console.warn('User document not readable:', err && err.message ? err.message : err);
+        }
+    }
+
+
+    // Single read of users/{uid}/power/power4. Firebase is authoritative:
+    // the result replaces LocalStorage and the UI.
+    async function readInitialPower(uid) {
+
+        try {
+
+            const powerRef = doc(db, 'users', uid, 'power', POWER_DOCUMENT_ID);
+
+            const snapshot = await getDoc(powerRef);
+
+            // A power was already consumed locally while this read was in
+            // flight. Keep the newer local values for this session; the
+            // background write carries them to Firebase.
+            if (powerChangedLocally) {
+                return;
+            }
+
+            if (!snapshot.exists()) {
+
+                console.warn(
+                    'Power document does not exist:',
+                    'users/' + uid + '/power/' + POWER_DOCUMENT_ID
+                );
+
+                const empty = createEmptyPowerState();
+
+                applyPowerToGame(empty);
+
+                savePowerToLocalStorage(empty);
+
+                return;
+            }
+
+            const data = snapshot.data();
+
+            if (
+                !data.power ||
+                typeof data.power !== 'object' ||
+                Array.isArray(data.power)
+            ) {
+
+                console.warn('Invalid power field in power4 document.');
+
+                const empty = createEmptyPowerState();
+
+                applyPowerToGame(empty);
+
+                savePowerToLocalStorage(empty);
+
+                return;
+            }
+
+            const fresh = normalizePowerObject(data.power);
+
+            applyPowerToGame(fresh);
+
+            savePowerToLocalStorage(fresh);
+
+        } catch (err) {
+
+            // Offline / server error: keep LocalStorage values silently.
+            console.warn('Initial power read failed:', err && err.message ? err.message : err);
+        }
+    }
+
+
+    // The ONE initial Firebase read of this page load.
+    async function performInitialRead(uid) {
+
+        if (initialReadStarted) {
+            return;
+        }
+
+        initialReadStarted = true;
+
+        await Promise.all([
+            readInitialUserData(uid),
+            readInitialPower(uid)
+        ]);
+    }
+
+
+    // One event-driven refresh after a successful backend coin reward
+    // (the backend is the only writer of coin, so the new value must be
+    // fetched once). Not a listener, not polling.
+    async function refreshBalancesOnce(uid) {
+
+        try {
+
+            const data = await readUserDocument(uid);
+
+            applyBalancesFromData(data);
+
+        } catch (err) {
+
+            // Silent: the coin value refreshes on the next page load.
+        }
+    }
+
+
+    // ================================================================
+    // BACKEND COIN REQUEST
+    // ================================================================
+
+    async function addRewardCoinViaBackend() {
+
+        if (rewardClaimInProgress) {
+            throw new Error('Reward claim already in progress.');
+        }
+
+        const user = auth.currentUser;
+
+        if (!user) {
+            throw new Error('User is not authenticated.');
+        }
+
+        rewardClaimInProgress = true;
+
+        try {
+
+            const idToken = await user.getIdToken();
+
+            const response = await fetch(
+                `${BACKEND_URL}/api/coin`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ coin: 1 })
+                }
+            );
+
+            if (!response.ok) {
+
+                let msg = `Coin update failed (HTTP ${response.status}).`;
+
+                try {
+                    const errBody = await response.json();
+                    if (errBody && errBody.message) {
+                        msg = errBody.message;
+                    }
+                } catch {
+                    // Ignore parsing error.
+                }
+
+                throw new Error(msg);
+            }
+
+            // Fetch the new authoritative coin value once (not awaited,
+            // the reward flow must not wait for it).
+            refreshBalancesOnce(user.uid);
+
+            return { ok: true };
+
+        } finally {
+            rewardClaimInProgress = false;
+        }
+    }
+
+
+    window.__backend = {
+        addRewardCoin: addRewardCoinViaBackend,
+        isClaimInProgress: () => rewardClaimInProgress
+    };
+
+
+    // ================================================================
+    // BACKGROUND POWER WRITE
+    //
+    // Called by the game AFTER the power has already been consumed in
+    // LocalStorage + UI and the game action has run. Never awaited by
+    // the game, never reads Firebase, never throws, never shows errors.
+    // Only the four power quantities are written (dot-notation paths),
+    // so the document structure stays unchanged.
+    // ================================================================
+
+    async function writePowerToFirebase(uid, power) {
+
+        try {
+
+            const powerRef = doc(db, 'users', uid, 'power', POWER_DOCUMENT_ID);
+
+            await updateDoc(powerRef, {
+                'power.reset': power.reset,
+                'power.idea': power.idea,
+                'power.replay': power.replay,
+                'power.preview': power.preview
+            });
+
+        } catch (err) {
+
+            // Silent by design: LocalStorage + UI keep the consumed power.
+            // The next page load resolves any mismatch using Firebase.
+            console.warn('Background power write failed:', err && err.message ? err.message : err);
+        }
+    }
+
+
+    async function syncPower(power) {
+
+        try {
+
+            powerChangedLocally = true;
+
+            const safePower = normalizePowerObject(power);
+
+            const user = auth.currentUser;
+
+            if (!user) {
+
+                // Auth is not ready yet: keep the latest values and send
+                // them as soon as the user is known.
+                pendingPowerWrite = safePower;
+
+                return;
+            }
+
+            pendingPowerWrite = null;
+
+            await writePowerToFirebase(user.uid, safePower);
+
+        } catch (err) {
+
+            // Never let a background write affect the game.
+        }
+    }
+
+
+    window.__firebasePower = {
+        syncPower: syncPower
+    };
+
+
+    // ================================================================
+    // AUTH STATE
+    // ================================================================
+
+    async function handleAuthState(user) {
+
+        if (user) {
+
+            userUid = user.uid;
+
+            console.log('Authenticated user UID:', userUid);
+
+            // LocalStorage + UI are already shown. Perform the single
+            // initial Firebase read now (no listeners are created).
+            await performInitialRead(userUid);
+
+            // A power consumed before auth was ready is written now.
+            if (pendingPowerWrite) {
+
+                const queued = pendingPowerWrite;
+
+                pendingPowerWrite = null;
+
+                writePowerToFirebase(userUid, queued);
+            }
+
+        } else {
+
+            console.log('User not authenticated');
+
+            userUid = null;
+
+            pendingPowerWrite = null;
+
+            if (window.__game) {
+
+                window.__game.state.coins = 0;
+                window.__game.updateCoinDisplay();
+
+                window.__game.state.diamonds = 0;
+                window.__game.updateDiamondDisplay();
+
+                applyPowerToGame(createEmptyPowerState());
+            }
+
+            saveCoinToLocalStorage(0);
+
+            saveDiamondToLocalStorage(0);
+
+            savePowerToLocalStorage(createEmptyPowerState());
+        }
+    }
+
+
+    // ================================================================
+    // DISABLE CLIENT COIN WRITE HELPERS
+    // ================================================================
+
+    function overrideGameFunctions() {
+
+        if (!window.__game) {
+            return;
+        }
+
+        window.__game.setDeveloperCoins = function () {
+            console.warn('setDeveloperCoins is DISABLED — coin writes are backend-only.');
+            return window.__game.state.coins;
+        };
+
+        window.__game.updateDeveloperCoins = function () {
+            console.warn('updateDeveloperCoins is DISABLED — coin writes are backend-only.');
+            return window.__game.state.coins;
+        };
+
+        window.__game.saveDeveloperCoins = function () {
+            // No-op.
+        };
+
+        window.__game.getTotalCoins = function () {
+            return window.__game.state.coins;
+        };
+
+        window.__game.getDeveloperCoins = function () {
+            return { totalCoins: window.__game.state.coins };
+        };
+
+        console.log('Coin writes remain backend-only.');
+    }
+
+
+    // ================================================================
+    // WAIT FOR GAME
+    // ================================================================
+
+    function waitForGame() {
+
+        return new Promise((resolve) => {
+
+            const check = () => {
+
+                if (window.__game && window.__game.state) {
+                    resolve();
+                } else {
+                    setTimeout(check, 50);
+                }
+            };
+
+            check();
+        });
+    }
+
+
+    // ================================================================
+    // FIREBASE INIT
+    // ================================================================
+
+    async function init() {
+
+        await waitForGame();
+
+        overrideGameFunctions();
+
+        // 1. LocalStorage FIRST: coin, diamond and power show immediately.
+        if (window.__game) {
+
+            window.__game.state.coins = getLocalCoin();
+            window.__game.updateCoinDisplay();
+
+            window.__game.state.diamonds = getLocalDiamond();
+            window.__game.updateDiamondDisplay();
+
+            applyPowerToGame(getLocalPower());
+        }
+
+        window.__firestore = { db, auth };
+
+        // 2. Then Firebase: one initial read once auth resolves.
+        onAuthStateChanged(auth, handleAuthState);
+
+        console.log('Data: LocalStorage first, single initial Firebase read.');
+        console.log('Coin: backend write / Firestore read.');
+        console.log('Diamond: backend write / Firestore read.');
+        console.log('Power: local consume, background Firestore write.');
+    }
+
+
+    init().catch(err => console.error('Firebase init error:', err));
+
+</script>
+
+
+<!-- =====================================================================
+     GAME SCRIPT
+
+     Tile system:
+       1. Load the source picture once.
+       2. Center-crop it to a 1:1 square (no stretching), capped to
+          MAX_SQUARE px and a multiple of 4.
+       3. Slice the square into 4x4 = 16 separate canvases and encode
+          each as its own image Blob (WebP, PNG fallback) = tile-01 ... tile-16.
+       4. Each puzzle block is a persistent <div> holding its own <img>
+          whose src is that tile's blob URL. No CSS background tricks.
+       5. DOM elements are created once and only re-positioned afterwards.
+     ===================================================================== -->
+
+<script>
+
+(function () {
+
+    'use strict';
+
+
+    var USER_DATA_KEY = 'userDatakv9688658vs';
+
+    // Previous key, read ONCE to carry old coin/diamond/picture values over.
+    var LEGACY_USER_DATA_KEY = 'userdata';
+
+    var DEFAULT_PICTURE = 'game_picture/image.jpg';
+
+    var TILE_GRID = 4;                 // 4 rows x 4 columns = 16 tiles
+    var MAX_SQUARE = 1024;             // max side (px) of the normalized square
+    var TILE_QUALITY = 0.95;           // WebP quality
+
+
+    // ================================================================
+    // localStorage
+    // ================================================================
+
+    function getUserData() {
+
+        try {
+
+            var raw = localStorage.getItem(USER_DATA_KEY);
+
+            if (!raw) {
+                return {};
+            }
+
+            var parsed = JSON.parse(raw);
+
+            return (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+                ? parsed
+                : {};
+
+        } catch (e) {
+
+            console.warn('Failed to read user data:', e);
+
+            return {};
+        }
+    }
+
+
+    function saveUserData(data) {
+
+        try {
+
+            var safe = (data && typeof data === 'object') ? data : {};
+
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(safe));
+
+        } catch (e) {
+
+            console.warn('Failed to save user data:', e);
+        }
+    }
+
+
+    function getLocalCoin() {
+
+        var data = getUserData();
+
+        return (typeof data.coin === 'number' && Number.isFinite(data.coin))
+            ? Math.max(0, Math.floor(data.coin))
+            : 0;
+    }
+
+
+    function saveCoinToLocalStorage(coin) {
+
+        var safeCoin = (typeof coin === 'number' && Number.isFinite(coin))
+            ? Math.max(0, Math.floor(coin))
+            : 0;
+
+        var data = getUserData();
+
+        data.coin = safeCoin;
+
+        saveUserData(data);
+    }
+
+
+    function getLocalDiamond() {
+
+        var data = getUserData();
+
+        return (typeof data.diamond === 'number' && Number.isFinite(data.diamond))
+            ? Math.max(0, Math.floor(data.diamond))
+            : 0;
+    }
+
+
+    function getLocalPicture() {
+
+        var data = getUserData();
+
+        if (typeof data.picture === 'string' && data.picture.trim()) {
+            return data.picture;
+        }
+
+        return DEFAULT_PICTURE;
+    }
+
+
+    // ---- Power (LocalStorage: userDatakv9688658vs.power) ---------------
+
+    function normalizePowerValue(value) {
+
+        return (typeof value === 'number' && Number.isInteger(value) && value >= 0)
+            ? value
+            : 0;
+    }
+
+
+    function normalizePowerObject(power) {
+
+        var src = (power && typeof power === 'object' && !Array.isArray(power))
+            ? power
+            : {};
+
+        return {
+            reset: normalizePowerValue(src.reset),
+            idea: normalizePowerValue(src.idea),
+            replay: normalizePowerValue(src.replay),
+            preview: normalizePowerValue(src.preview)
+        };
+    }
+
+
+    function getLocalPower() {
+
+        return normalizePowerObject(getUserData().power);
+    }
+
+
+    function savePowerToLocalStorage(power) {
+
+        var data = getUserData();
+
+        data.power = normalizePowerObject(power);
+
+        saveUserData(data);
+    }
+
+
+    // Guarantees the stored object always has the full expected structure:
+    // { coin, diamond, power: { reset, idea, replay, preview } }.
+    // On the very first run with the new key, old values are carried over
+    // from the previous "userdata" key (coin, diamond, picture only).
+    function ensureUserDataStructure() {
+
+        var data = getUserData();
+
+        var hadKey = false;
+
+        try {
+            hadKey = localStorage.getItem(USER_DATA_KEY) !== null;
+        } catch (e) {
+            hadKey = false;
+        }
+
+        if (!hadKey) {
+
+            try {
+
+                var legacyRaw = localStorage.getItem(LEGACY_USER_DATA_KEY);
+
+                if (legacyRaw) {
+
+                    var legacy = JSON.parse(legacyRaw);
+
+                    if (legacy && typeof legacy === 'object' && !Array.isArray(legacy)) {
+
+                        if (typeof legacy.coin === 'number' && Number.isFinite(legacy.coin)) {
+                            data.coin = legacy.coin;
+                        }
+
+                        if (typeof legacy.diamond === 'number' && Number.isFinite(legacy.diamond)) {
+                            data.diamond = legacy.diamond;
+                        }
+
+                        if (typeof legacy.picture === 'string' && legacy.picture.trim()) {
+                            data.picture = legacy.picture;
+                        }
+                    }
+                }
+
+            } catch (e) {
+                // Ignore legacy migration errors.
+            }
+        }
+
+        data.coin = (typeof data.coin === 'number' && Number.isFinite(data.coin))
+            ? Math.max(0, Math.floor(data.coin))
+            : 0;
+
+        data.diamond = (typeof data.diamond === 'number' && Number.isFinite(data.diamond))
+            ? Math.max(0, Math.floor(data.diamond))
+            : 0;
+
+        data.power = normalizePowerObject(data.power);
+
+        saveUserData(data);
+    }
+
+
+    // ================================================================
+    // COIN DISPLAY
+    // ================================================================
+
+    function formatCoinDisplay(value) {
+
+        if (typeof value !== 'number' || isNaN(value) || value < 0) {
+            value = 0;
+        }
+
+        value = Math.floor(value);
+
+        if (value < 10000) {
+            return String(value);
+        }
+
+        if (value < 1000000) {
+
+            var k = value / 1000;
+
+            if (k % 1 === 0) {
+                return String(k) + 'K';
+            }
+
+            var truncated = Math.floor(k * 10) / 10;
+
+            return String(truncated) + 'K';
+        }
+
+        var m = value / 1000000;
+
+        if (m % 1 === 0) {
+            return String(m) + 'M';
+        }
+
+        var decimalPlaces = (m >= 1000) ? 0 : (m >= 10) ? 1 : 2;
+
+        var factor = Math.pow(10, decimalPlaces);
+
+        var truncatedM = Math.floor(m * factor) / factor;
+
+        var str = String(truncatedM);
+
+        if (str.length > 4) {
+
+            while (decimalPlaces > 0 && str.length > 4) {
+
+                decimalPlaces--;
+
+                factor = Math.pow(10, decimalPlaces);
+
+                truncatedM = Math.floor(m * factor) / factor;
+
+                str = String(truncatedM);
+            }
+
+            if (str.length > 4) {
+
+                var intPart = Math.floor(m);
+
+                str = String(intPart);
+
+                while (str.length > 4) {
+
+                    intPart = Math.floor(intPart / 10);
+
+                    str = String(intPart);
+                }
+            }
+        }
+
+        return str + 'M';
+    }
+
+
+    // ================================================================
+    // REWARD
+    // ================================================================
+
+    var REWARD_COOLDOWN = 800000;
+
+    var REWARD_AMOUNT = 1;
+
+
+    // ================================================================
+    // GAME STATE
+    // ================================================================
+
+    var gameState = {
+
+        rows: 4,
+
+        columns: 4,
+
+        emptyRow: 1,
+
+        emptyCol: 1,
+
+        elapsedSeconds: 0,
+
+        coins: 0,
+
+        diamonds: 0,
+
+        timerInterval: null,
+
+        isRunning: false,
+
+        isAnimating: false,
+
+        board: [],
+
+        animTimeout: null,
+
+        resizePending: false,
+
+        cellSize: 0,
+
+        tilesReady: false,
+
+        activeMove: null
+
+    };
+
+
+    /*
+     * Power lives in LocalStorage (userDatakv9688658vs.power) and is shown
+     * from there immediately. Firebase replaces it once per page load.
+     * Firestore: users/{uid}/power/power4  ->  power.{reset,idea,replay,preview}
+     */
+
+    var gamePower = {
+
+        reset: 0,
+
+        idea: 0,
+
+        replay: 0,
+
+        preview: 0
+
+    };
+
+
+    var currentPicture = DEFAULT_PICTURE;
+
+
+    // ================================================================
+    // DOM
+    // ================================================================
+
+    var coinDisplay = document.getElementById('coinDisplay');
+
+    var diamondDisplay = document.getElementById('diamondDisplay');
+
+    var gameArea = document.getElementById('gameArea');
+
+    var animationLayer = document.getElementById('animationLayer');
+
+    var boardContainer = document.querySelector('.board-container');
+
+    var gameAreaWrap = document.querySelector('.game-area-wrap');
+
+    var homeBtn = document.getElementById('homeBtn');
+
+    var fullImagePreview = document.getElementById('fullImagePreview');
+
+    var boardStatus = document.getElementById('boardStatus');
+
+    var viewBtn = document.querySelector('.view-btn');
+
+    var viewIcon = viewBtn.querySelector('.view-icon');
+
+    var resetBtn = document.querySelector('.reset-btn');
+
+    var replayBtn = document.querySelector('.replay-btn');
+
+    var ideaBtn = document.querySelector('.idea-btn');
+
+    var rewardOverlay = document.getElementById('rewardOverlay');
+
+    var rewardClaimBtn = document.getElementById('rewardClaimBtn');
+
+    var continueBtn = document.getElementById('continueBtn');
+
+    var isViewMode = false;
+
+    var usageViewEl = document.getElementById('usageView');
+
+    var usageResetEl = document.getElementById('usageReset');
+
+    var usageReplayEl = document.getElementById('usageReplay');
+
+    var usageIdeaEl = document.getElementById('usageIdea');
+
+
+    // ================================================================
+    // POWER BADGES
+    // ================================================================
+
+    function updatePowerBadges() {
+
+        var power = (gamePower && typeof gamePower === 'object') ? gamePower : {};
+
+        function hasPower(value) {
+
+            var n = Number(value);
+
+            return Number.isInteger(n) && n > 0;
+        }
+
+        // Green dot only: visible when quantity > 0, hidden when 0.
+        // The quantity itself is never written to the DOM.
+        function setDot(el, value) {
+
+            if (!el) {
+                return;
+            }
+
+            el.textContent = '';
+
+            if (hasPower(value)) {
+                el.classList.add('has-power');
+            } else {
+                el.classList.remove('has-power');
+            }
+        }
+
+        setDot(usageViewEl, power.preview);
+
+        setDot(usageResetEl, power.reset);
+
+        setDot(usageReplayEl, power.replay);
+
+        setDot(usageIdeaEl, power.idea);
+    }
+
+
+    // Copies a power object into the shared gamePower object (same
+    // reference, updated in place) and refreshes the badges.
+    function setGamePowerFrom(power) {
+
+        var p = normalizePowerObject(power);
+
+        gamePower.reset = p.reset;
+
+        gamePower.idea = p.idea;
+
+        gamePower.replay = p.replay;
+
+        gamePower.preview = p.preview;
+
+        updatePowerBadges();
+    }
+
+
+    // ================================================================
+    // BOARD STATUS (loading / error)
+    // ================================================================
+
+    var statusRetry = null;
+
+    function setBoardStatus(message, retryFn) {
+
+        if (!boardStatus) {
+            return;
+        }
+
+        statusRetry = retryFn || null;
+
+        if (!message) {
+
+            boardStatus.classList.remove('active', 'error');
+
+            boardStatus.textContent = '';
+
+            return;
+        }
+
+        boardStatus.textContent = message;
+
+        boardStatus.classList.add('active');
+
+        if (retryFn) {
+            boardStatus.classList.add('error');
+        } else {
+            boardStatus.classList.remove('error');
+        }
+    }
+
+
+    boardStatus.addEventListener('click', function () {
+
+        if (statusRetry) {
+
+            var fn = statusRetry;
+
+            statusRetry = null;
+
+            fn();
+        }
+    });
+
+
+    // ================================================================
+    // TILE GENERATION
+    //
+    // Original picture -> normalized 1:1 square -> 16 separate image
+    // Blobs. Generated ONCE per picture and reused. Blob URLs are
+    // revoked when the picture is replaced or the page unloads.
+    // ================================================================
+
+    function loadImage(src) {
+
+        return new Promise(function (resolve, reject) {
+
+            var img = new Image();
+
+            try {
+
+                var u = new URL(src, window.location.href);
+
+                if (u.origin !== window.location.origin) {
+                    img.crossOrigin = 'anonymous';
+                }
+
+            } catch (e) {
+                // Relative / invalid URL: browser will resolve or fail.
+            }
+
+            img.decoding = 'async';
+
+            img.onload = function () {
+                resolve(img);
+            };
+
+            img.onerror = function () {
+                reject(new Error('Failed to load image: ' + src));
+            };
+
+            img.src = src;
+        });
+    }
+
+
+    function canvasToBlob(canvas) {
+
+        return new Promise(function (resolve, reject) {
+
+            try {
+
+                // Browsers without WebP encoding return a PNG blob instead.
+                canvas.toBlob(function (blob) {
+
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('Canvas export failed.'));
+                    }
+
+                }, 'image/webp', TILE_QUALITY);
+
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+
+    function decodeUrl(url) {
+
+        var im = new Image();
+
+        im.src = url;
+
+        if (typeof im.decode === 'function') {
+
+            return im.decode().catch(function () {
+                // Decode failure is non-fatal; the <img> will retry on display.
+            });
+        }
+
+        return new Promise(function (resolve) {
+
+            im.onload = im.onerror = function () {
+                resolve();
+            };
+        });
+    }
+
+
+    /*
+     * Returns {
+     *   squareUrl : blob URL of the normalized square,
+     *   urls      : array of 16 blob URLs, urls[k] = tile-(k+1),
+     *               row = floor(k / 4), column = k % 4,
+     *   side, tileSize
+     * }
+     */
+
+    function buildTileSet(src) {
+
+        return loadImage(src).then(function (img) {
+
+            var natW = img.naturalWidth || img.width;
+
+            var natH = img.naturalHeight || img.height;
+
+            if (!natW || !natH) {
+                throw new Error('Image has no dimensions.');
+            }
+
+            // Center-crop to 1:1 (no stretching).
+            var cropSide = Math.min(natW, natH);
+
+            var sx = Math.floor((natW - cropSide) / 2);
+
+            var sy = Math.floor((natH - cropSide) / 2);
+
+            // Output side: capped and an exact multiple of the grid size so
+            // all 16 tiles are identical in size with no gaps or overlaps.
+            var side = Math.floor(Math.min(cropSide, MAX_SQUARE) / TILE_GRID) * TILE_GRID;
+
+            if (side < TILE_GRID) {
+                throw new Error('Image is too small to slice.');
+            }
+
+            var tileSize = side / TILE_GRID;
+
+            var square = document.createElement('canvas');
+
+            square.width = side;
+
+            square.height = side;
+
+            var sctx = square.getContext('2d');
+
+            sctx.imageSmoothingQuality = 'high';
+
+            sctx.drawImage(img, sx, sy, cropSide, cropSide, 0, 0, side, side);
+
+            var promises = [];
+
+            promises.push(canvasToBlob(square));
+
+            for (var r = 0; r < TILE_GRID; r++) {
+
+                for (var c = 0; c < TILE_GRID; c++) {
+
+                    var tc = document.createElement('canvas');
+
+                    tc.width = tileSize;
+
+                    tc.height = tileSize;
+
+                    tc.getContext('2d').drawImage(
+                        square,
+                        c * tileSize, r * tileSize, tileSize, tileSize,
+                        0, 0, tileSize, tileSize
+                    );
+
+                    promises.push(canvasToBlob(tc));
+                }
+            }
+
+            return Promise.all(promises).then(function (blobs) {
+
+                var urls = [];
+
+                for (var i = 1; i < blobs.length; i++) {
+                    urls.push(URL.createObjectURL(blobs[i]));
+                }
+
+                var set = {
+                    squareUrl: URL.createObjectURL(blobs[0]),
+                    urls: urls,
+                    side: side,
+                    tileSize: tileSize
+                };
+
+                // Preload + decode everything before the board may show it.
+                var decodes = [decodeUrl(set.squareUrl)];
+
+                for (var j = 0; j < urls.length; j++) {
+                    decodes.push(decodeUrl(urls[j]));
+                }
+
+                return Promise.all(decodes).then(function () {
+                    return set;
+                });
+            });
+        });
+    }
+
+
+    function revokeTileSet(set) {
+
+        if (!set) {
+            return;
+        }
+
+        try {
+
+            if (set.squareUrl) {
+                URL.revokeObjectURL(set.squareUrl);
+            }
+
+            for (var i = 0; i < set.urls.length; i++) {
+                URL.revokeObjectURL(set.urls[i]);
+            }
+
+        } catch (e) {
+            // Ignore.
+        }
+    }
+
+
+    // ================================================================
+    // PERSISTENT TILE ELEMENTS
+    //
+    // 15 image blocks + 1 empty block are created ONCE and reused for the
+    // whole session. Moving / resetting / shuffling only changes grid
+    // position; the <img> src is only touched when the picture changes.
+    // ================================================================
+
+    var tileEls = [];          // tileEls[id], id = 1..15
+    var emptyEl = null;
+    var tileSet = null;        // currently applied set
+    var pictureToken = 0;
+
+
+    function createImageBlock(tileId) {
+
+        var origRow = Math.floor(tileId / gameState.columns) + 1;
+
+        var origCol = (tileId % gameState.columns) + 1;
+
+        var block = document.createElement('div');
+
+        block.className = 'game-block';
+
+        var img = document.createElement('img');
+
+        img.className = 'tile-img';
+
+        img.alt = '';
+
+        img.draggable = false;
+
+        img.decoding = 'async';
+
+        block.appendChild(img);
+
+        block.dataset.tileId = tileId;
+
+        block.dataset.originalRow = origRow;
+
+        block.dataset.originalColumn = origCol;
+
+        block.dataset.row = origRow;
+
+        block.dataset.column = origCol;
+
+        block.dataset.blockId = 'block-' + origRow + '-' + origCol;
+
+        block.addEventListener('click', function (e) {
+
+            e.stopPropagation();
+
+            var r = parseInt(this.dataset.row);
+
+            var c = parseInt(this.dataset.column);
+
+            tryMoveBlock(r, c);
+        });
+
+        return block;
+    }
+
+
+    function ensureElements() {
+
+        if (emptyEl) {
+            return;
+        }
+
+        var total = gameState.rows * gameState.columns;
+
+        for (var id = 1; id < total; id++) {
+
+            var el = createImageBlock(id);
+
+            if (gameState.cellSize) {
+
+                el.style.width = gameState.cellSize + 'px';
+
+                el.style.height = gameState.cellSize + 'px';
+            }
+
+            tileEls[id] = el;
+
+            gameArea.appendChild(el);
+        }
+
+        emptyEl = document.createElement('div');
+
+        emptyEl.className = 'game-block empty-block';
+
+        emptyEl.dataset.blockId = 'block-empty';
+
+        if (gameState.cellSize) {
+
+            emptyEl.style.width = gameState.cellSize + 'px';
+
+            emptyEl.style.height = gameState.cellSize + 'px';
+        }
+
+        gameArea.appendChild(emptyEl);
+    }
+
+
+    function applyTileSet(set) {
+
+        ensureElements();
+
+        for (var id = 1; id < tileEls.length; id++) {
+
+            // urls[k] = tile-(k+1); tile id k shows image piece k.
+            var img = tileEls[id].firstChild;
+
+            if (img.getAttribute('src') !== set.urls[id]) {
+                img.src = set.urls[id];
+            }
+        }
+
+        var prev = fullImagePreview.firstChild;
+
+        if (!prev) {
+
+            prev = document.createElement('img');
+
+            prev.alt = '';
+
+            prev.draggable = false;
+
+            fullImagePreview.appendChild(prev);
+        }
+
+        prev.src = set.squareUrl;
+    }
+
+
+    function setPicture(src) {
+
+        var token = ++pictureToken;
+
+        return buildTileSet(src).then(function (set) {
+
+            if (token !== pictureToken) {
+
+                // A newer picture request superseded this one.
+                revokeTileSet(set);
+
+                return;
+            }
+
+            var old = tileSet;
+
+            applyTileSet(set);
+
+            tileSet = set;
+
+            if (old) {
+                revokeTileSet(old);
+            }
+        });
+    }
+
+
+    window.addEventListener('pagehide', function () {
+
+        revokeTileSet(tileSet);
+
+        tileSet = null;
+    });
+
+
+    // ================================================================
+    // PICTURE
+    // ================================================================
+
+    function applyPictureToDOM() {
+
+        var previous = tileSet ? true : false;
+
+        var wanted = currentPicture;
+
+        setPicture(wanted).catch(function (err) {
+
+            console.error('Could not switch picture:', err);
+
+            if (previous && currentPicture === wanted) {
+                currentPicture = DEFAULT_PICTURE;
+            }
+        });
+    }
+
+
+    // ================================================================
+    // VIEW MODE
+    // ================================================================
+
+    function toggleViewMode() {
+
+        isViewMode = !isViewMode;
+
+        updateViewMode();
+    }
+
+
+    function updateViewMode() {
+
+        if (!fullImagePreview) {
+            return;
+        }
+
+        if (isViewMode) {
+
+            boardContainer.classList.add('view-mode-active');
+
+            viewBtn.setAttribute('aria-label', 'Hide full image preview');
+
+            viewIcon.src = 'picture_resource/icon/on_view.png';
+
+        } else {
+
+            boardContainer.classList.remove('view-mode-active');
+
+            viewBtn.setAttribute('aria-label', 'Show full image preview');
+
+            viewIcon.src = 'picture_resource/icon/off_view.png';
+        }
+    }
+
+
+    // ================================================================
+    // POWER BUTTON HELPER — LOCALSTORAGE FIRST
+    //
+    // 1. Read the power count from LocalStorage.
+    // 2. If > 0: decrease it by exactly 1, save to LocalStorage and
+    //    update the UI immediately.
+    // 3. Run the game action immediately (never waits for Firebase).
+    // 4. Afterwards, send the new power values to Firebase in the
+    //    background. That write is fire-and-forget; any failure is
+    //    silent and never undoes the consumed power.
+    //
+    // Returns true when the power was consumed, otherwise false.
+    // ================================================================
+
+    function handlePowerUse(powerField, action) {
+
+        if (!gameState.tilesReady) {
+            // Do not spend Power while the board is still loading.
+            return false;
+        }
+
+        var power = getLocalPower();
+
+        var available = power[powerField];
+
+        if (!(available > 0)) {
+            return false;
+        }
+
+        // Consume exactly 1 locally.
+        power[powerField] = available - 1;
+
+        savePowerToLocalStorage(power);
+
+        setGamePowerFrom(power);
+
+        // Game action: runs right away, never waits for Firebase.
+        try {
+
+            action();
+
+        } catch (error) {
+
+            console.error('Power action "' + powerField + '" failed:', error);
+        }
+
+        // Background Firebase write (no await, no UI, no error handling
+        // visible to the player).
+        try {
+
+            if (
+                window.__firebasePower &&
+                typeof window.__firebasePower.syncPower === 'function'
+            ) {
+
+                var pending = window.__firebasePower.syncPower({
+                    reset: power.reset,
+                    idea: power.idea,
+                    replay: power.replay,
+                    preview: power.preview
+                });
+
+                if (pending && typeof pending.catch === 'function') {
+                    pending.catch(function () { /* silent */ });
+                }
+            }
+
+        } catch (e) {
+            // Silent.
+        }
+
+        return true;
+    }
+
+
+    // ================================================================
+    // POWER BUTTONS
+    // ================================================================
+
+    // Turning the preview ON costs exactly 1 "preview" power.
+    // Turning it OFF is always free and never touches Firebase.
+
+    viewBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Preview is ON -> turn it OFF immediately, no power consumed.
+        if (isViewMode) {
+
+            toggleViewMode();
+
+            return;
+        }
+
+        // Preview is OFF -> consume 1 "preview" power locally, then show it.
+        handlePowerUse('preview', function () {
+
+            if (!isViewMode) {
+                toggleViewMode();
+            }
+        });
+    });
+
+
+    resetBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (hintBusy) {
+            return;
+        }
+
+        handlePowerUse('reset', function () {
+            resetGame();
+        });
+    });
+
+
+    replayBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (hintBusy) {
+            return;
+        }
+
+        handlePowerUse('replay', function () {
+            replayPuzzle();
+        });
+    });
+
+
+    ideaBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Smart hint: validates + solves FIRST, spends 1 "idea" power only
+        // when a correct hint is ready to be shown.
+        requestHint();
+    });
+
+
+    // ================================================================
+    // REPLAY
+    // ================================================================
+
+    function replayPuzzle() {
+
+        // Nothing to restore yet (puzzle was never generated).
+        if (!originalPuzzleState) {
+            return;
+        }
+
+        if (isViewMode) {
+
+            isViewMode = false;
+
+            updateViewMode();
+        }
+
+        clearAnimationState();
+
+        stopTimer();
+
+        gameState.elapsedSeconds = 0;
+
+        updateTimerDisplay();
+
+        hideRewardPopup();
+
+        // Restore the SAVED starting arrangement (a fresh deep copy, so the
+        // saved original can never be modified by moves). No new shuffle.
+        renderFromState(cloneState(originalPuzzleState));
+
+        scheduleBoardSize();
+
+        startTimer();
+    }
+
+
+    // ================================================================
+    // IDEA / SMART HINT
+    //
+    // 1. Read the REAL current board (never the original shuffle).
+    // 2. Validate it (not solved, valid permutation, solvable).
+    // 3. Solve it with weighted IDA* + Manhattan heuristic in a Web Worker
+    //    (main-thread fallback), then verify the returned path move by
+    //    move. An unverified path is never used.
+    // 4. Only AFTER a verified next move exists is 1 "idea" power spent
+    //    (LocalStorage first, Firebase written in the background).
+    // 5. The tile for that move blinks; nothing is moved automatically.
+    //
+    // A verified solution path is cached. If the player follows it, the
+    // next hint is read from the cached path (guaranteed progress). If the
+    // board is not on the cached path, a fresh solution is calculated from
+    // the latest arrangement.
+    // ================================================================
+
+    var HINT_SOLVE_MS = 4000;          // total solver time budget
+
+    var hintBusy = false;              // a hint request is in flight
+
+    var hintPlan = null;               // { sigs: [...], moves: [...] }
+
+    var hintState = null;              // active blink: { el, timer, outline, offset }
+
+
+    /*
+     * Pure, self-contained solver (it is also serialized into a Web Worker,
+     * so it must not reference anything outside itself).
+     *
+     * tiles: flat array of 16 numbers, index = row * 4 + col, 0 = empty.
+     * Goal : [0, 1, 2, ... 15] (empty top-left, tiles in order).
+     *
+     * Returns one of:
+     *   { status: 'solved' }
+     *   { status: 'invalid' }
+     *   { status: 'unsolvable' }
+     *   { status: 'timeout' }
+     *   { status: 'ok', path: [i1, i2, ...] }   // successive indexes the
+     *                                           // empty cell moves to
+     */
+
+    function solvePuzzle(tiles, maxMs) {
+
+        'use strict';
+
+        var i, j;
+
+        if (!tiles || tiles.length !== 16) {
+            return { status: 'invalid' };
+        }
+
+        var seen = [];
+
+        for (i = 0; i < 16; i++) {
+
+            var v = tiles[i];
+
+            if (typeof v !== 'number' || v !== Math.floor(v) || v < 0 || v > 15 || seen[v]) {
+                return { status: 'invalid' };
+            }
+
+            seen[v] = true;
+        }
+
+        var blank0 = tiles.indexOf(0);
+
+        var isGoal = true;
+
+        for (i = 0; i < 16; i++) {
+
+            if (tiles[i] !== i) {
+
+                isGoal = false;
+
+                break;
+            }
+        }
+
+        if (isGoal) {
+            return { status: 'solved' };
+        }
+
+        // Solvability: permutation parity must equal blank-distance parity.
+        var inversions = 0;
+
+        for (i = 0; i < 16; i++) {
+
+            for (j = i + 1; j < 16; j++) {
+
+                if (tiles[i] > tiles[j]) {
+                    inversions++;
+                }
+            }
+        }
+
+        if ((inversions % 2) !== (((blank0 >> 2) + (blank0 & 3)) % 2)) {
+            return { status: 'unsolvable' };
+        }
+
+        // Neighbour table.
+        var NEI = [];
+
+        for (i = 0; i < 16; i++) {
+
+            var r = i >> 2;
+
+            var c = i & 3;
+
+            var list = [];
+
+            if (r > 0) { list.push(i - 4); }
+            if (r < 3) { list.push(i + 4); }
+            if (c > 0) { list.push(i - 1); }
+            if (c < 3) { list.push(i + 1); }
+
+            NEI[i] = list;
+        }
+
+        // Manhattan table: MD[tile * 16 + position]
+        var MD = new Int8Array(16 * 16);
+
+        for (var t = 1; t < 16; t++) {
+
+            for (var pos = 0; pos < 16; pos++) {
+
+                MD[t * 16 + pos] =
+                    Math.abs((t >> 2) - (pos >> 2)) +
+                    Math.abs((t & 3) - (pos & 3));
+            }
+        }
+
+        var h0 = 0;
+
+        for (i = 0; i < 16; i++) {
+
+            if (tiles[i] !== 0) {
+                h0 += MD[tiles[i] * 16 + i];
+            }
+        }
+
+        function runStage(w, deadline) {
+
+            var bb = tiles.slice();
+
+            var h = h0;
+
+            var nodes = 0;
+
+            var aborted = false;
+
+            var plen = 0;
+
+            var FOUND = -1;
+
+            var INF = 1000000000;
+
+            var path = new Int16Array(256);
+
+            function dfs(g, bound, bl, prev) {
+
+                var f = g + w * h;
+
+                if (f > bound) {
+                    return f;
+                }
+
+                if (h === 0) {
+
+                    plen = g;
+
+                    return FOUND;
+                }
+
+                nodes++;
+
+                if ((nodes & 8191) === 0 && Date.now() > deadline) {
+
+                    aborted = true;
+
+                    return INF;
+                }
+
+                if (g >= 250) {
+                    return INF;
+                }
+
+                var min = INF;
+
+                var nb = NEI[bl];
+
+                for (var k = 0; k < nb.length; k++) {
+
+                    var n = nb[k];
+
+                    if (n === prev) {
+                        continue;
+                    }
+
+                    var tile = bb[n];
+
+                    var d = MD[tile * 16 + bl] - MD[tile * 16 + n];
+
+                    bb[bl] = tile;
+
+                    bb[n] = 0;
+
+                    h += d;
+
+                    path[g] = n;
+
+                    var res = dfs(g + 1, bound, n, bl);
+
+                    if (res === FOUND) {
+                        return FOUND;
+                    }
+
+                    bb[n] = tile;
+
+                    bb[bl] = 0;
+
+                    h -= d;
+
+                    if (aborted) {
+                        return INF;
+                    }
+
+                    if (res < min) {
+                        min = res;
+                    }
+                }
+
+                return min;
+            }
+
+            var bound = w * h0;
+
+            while (true) {
+
+                var res = dfs(0, bound, blank0, -1);
+
+                if (res === FOUND) {
+
+                    var out = [];
+
+                    for (var q = 0; q < plen; q++) {
+                        out.push(path[q]);
+                    }
+
+                    return out;
+                }
+
+                if (aborted || res >= INF) {
+                    return null;
+                }
+
+                bound = res;
+            }
+        }
+
+        // Stage 1 looks for an optimal solution quickly; later stages trade
+        // optimality for speed so a valid path is found in time.
+        var weights = [1, 2, 4];
+
+        var shares = [0.2, 0.55, 1.0];
+
+        var start = Date.now();
+
+        for (var s = 0; s < weights.length; s++) {
+
+            var found = runStage(weights[s], start + maxMs * shares[s]);
+
+            if (found && found.length) {
+                return { status: 'ok', path: found };
+            }
+        }
+
+        return { status: 'timeout' };
+    }
+
+
+    /*
+     * Independently verifies a solver path against the real board:
+     * every step must be an adjacent empty-cell move and the final
+     * arrangement must be the solved state. Returns the list of board
+     * signatures along the path, or null if anything is wrong.
+     */
+
+    function verifyHintPath(tiles, path) {
+
+        if (!path || !path.length) {
+            return null;
+        }
+
+        var b = tiles.slice();
+
+        var blank = b.indexOf(0);
+
+        var sigs = [b.join(',')];
+
+        for (var k = 0; k < path.length; k++) {
+
+            var n = path[k];
+
+            if (typeof n !== 'number' || n < 0 || n > 15 || n !== Math.floor(n)) {
+                return null;
+            }
+
+            var dist = Math.abs((blank >> 2) - (n >> 2)) + Math.abs((blank & 3) - (n & 3));
+
+            if (dist !== 1) {
+                return null;
+            }
+
+            b[blank] = b[n];
+
+            b[n] = 0;
+
+            blank = n;
+
+            sigs.push(b.join(','));
+        }
+
+        for (var i = 0; i < 16; i++) {
+
+            if (b[i] !== i) {
+                return null;
+            }
+        }
+
+        return sigs;
+    }
+
+
+    /*
+     * Runs the solver off the main thread (Web Worker from a Blob URL).
+     * Falls back to a short synchronous solve only if a worker cannot be
+     * created. Always resolves; never rejects.
+     */
+
+    function solveAsync(tiles) {
+
+        return new Promise(function (resolve) {
+
+            var settled = false;
+
+            var worker = null;
+
+            var workerUrl = null;
+
+            var guard = null;
+
+            function finish(result) {
+
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+
+                if (guard) {
+                    clearTimeout(guard);
+                }
+
+                if (worker) {
+
+                    try { worker.terminate(); } catch (e) { /* ignore */ }
+                }
+
+                if (workerUrl) {
+
+                    try { URL.revokeObjectURL(workerUrl); } catch (e) { /* ignore */ }
+                }
+
+                resolve(result);
+            }
+
+            function fallback() {
+
+                var result;
+
+                try {
+
+                    result = solvePuzzle(tiles, 1500);
+
+                } catch (err) {
+
+                    console.error('Hint solver failed:', err);
+
+                    result = { status: 'timeout' };
+                }
+
+                finish(result);
+            }
+
+            try {
+
+                var src =
+                    'self.onmessage=function(e){' +
+                    'var r;try{r=(' + solvePuzzle.toString() + ')(e.data.tiles,e.data.maxMs);}' +
+                    'catch(err){r={status:"timeout"};}' +
+                    'self.postMessage(r);};';
+
+                workerUrl = URL.createObjectURL(new Blob([src], { type: 'application/javascript' }));
+
+                worker = new Worker(workerUrl);
+
+                worker.onmessage = function (e) {
+                    finish(e.data || { status: 'timeout' });
+                };
+
+                worker.onerror = function () {
+
+                    if (worker) {
+
+                        try { worker.terminate(); } catch (e) { /* ignore */ }
+
+                        worker = null;
+                    }
+
+                    fallback();
+                };
+
+                guard = setTimeout(function () {
+                    finish({ status: 'timeout' });
+                }, HINT_SOLVE_MS + 1500);
+
+                worker.postMessage({ tiles: tiles, maxMs: HINT_SOLVE_MS });
+
+            } catch (err) {
+
+                fallback();
+            }
+        });
+    }
+
+
+    // Current real board as a flat array (0 = empty), or null if invalid.
+    function getCurrentTiles() {
+
+        var rows = gameState.rows;
+
+        var cols = gameState.columns;
+
+        if (rows !== 4 || cols !== 4 || !gameState.board || gameState.board.length !== rows) {
+            return null;
+        }
+
+        var tiles = [];
+
+        var used = {};
+
+        var emptyCount = 0;
+
+        for (var r = 0; r < rows; r++) {
+
+            if (!gameState.board[r] || gameState.board[r].length !== cols) {
+                return null;
+            }
+
+            for (var c = 0; c < cols; c++) {
+
+                var el = gameState.board[r][c];
+
+                if (!el) {
+
+                    emptyCount++;
+
+                    if (gameState.emptyRow !== r + 1 || gameState.emptyCol !== c + 1) {
+                        return null;
+                    }
+
+                    tiles.push(0);
+
+                } else {
+
+                    var id = parseInt(el.dataset.tileId, 10);
+
+                    if (!(id >= 1 && id <= 15) || used[id]) {
+                        return null;
+                    }
+
+                    used[id] = true;
+
+                    tiles.push(id);
+                }
+            }
+        }
+
+        return (emptyCount === 1 && tiles.length === 16) ? tiles : null;
+    }
+
+
+    // Resolves with the flat index of the tile to move next, or null.
+    function findNextHintMove(tiles) {
+
+        var sig = tiles.join(',');
+
+        // Player is following the cached verified path -> next step of it.
+        if (hintPlan) {
+
+            var at = hintPlan.sigs.indexOf(sig);
+
+            if (at >= 0 && at < hintPlan.moves.length) {
+                return Promise.resolve(hintPlan.moves[at]);
+            }
+        }
+
+        // Otherwise solve the latest arrangement from scratch.
+        return solveAsync(tiles).then(function (result) {
+
+            if (!result || result.status !== 'ok') {
+
+                console.warn('No hint available:', result && result.status);
+
+                return null;
+            }
+
+            var sigs = verifyHintPath(tiles, result.path);
+
+            if (!sigs) {
+
+                console.error('Solver returned an invalid path; hint discarded.');
+
+                return null;
+            }
+
+            hintPlan = { sigs: sigs, moves: result.path };
+
+            return result.path[0];
+        });
+    }
+
+
+    function requestHint() {
+
+        // No power is touched for any of these.
+        if (hintBusy || !gameState.tilesReady || gameState.isAnimating || isViewMode) {
+            return;
+        }
+
+        // No idea power left (LocalStorage): nothing to solve or spend.
+        if (!(getLocalPower().idea > 0)) {
+            return;
+        }
+
+        var tiles = getCurrentTiles();
+
+        if (!tiles) {
+            return;
+        }
+
+        if (isGoalState(boardTilesToState(tiles))) {
+            return;
+        }
+
+        var sig = tiles.join(',');
+
+        hintBusy = true;
+
+        findNextHintMove(tiles)
+
+            .then(function (moveIndex) {
+
+                if (moveIndex === null || moveIndex === undefined) {
+                    return;
+                }
+
+                // Board must still be exactly what was analysed.
+                var again = getCurrentTiles();
+
+                if (!again || again.join(',') !== sig || gameState.isAnimating) {
+                    return;
+                }
+
+                // A verified hint exists -> NOW spend exactly 1 idea power
+                // (LocalStorage first, Firebase in the background).
+                handlePowerUse('idea', function () {
+
+                    var now = getCurrentTiles();
+
+                    if (!now || now.join(',') !== sig || gameState.isAnimating) {
+                        return;
+                    }
+
+                    displayHint((moveIndex >> 2) + 1, (moveIndex & 3) + 1);
+                });
+            })
+
+            .catch(function (err) {
+
+                console.error('Hint request failed:', err);
+            })
+
+            .finally(function () {
+
+                hintBusy = false;
+            });
+    }
+
+
+    function boardTilesToState(tiles) {
+
+        var state = [];
+
+        for (var r = 0; r < 4; r++) {
+
+            state[r] = tiles.slice(r * 4, r * 4 + 4);
+        }
+
+        return state;
+    }
+
+
+    // Removes the current hint highlight and restores the tile's outline.
+    function clearHint() {
+
+        if (!hintState) {
+            return;
+        }
+
+        clearInterval(hintState.timer);
+
+        hintState.el.style.outline = hintState.outline || '';
+
+        hintState.el.style.outlineOffset = hintState.offset || '';
+
+        hintState = null;
+    }
+
+
+    // Blinks the yellow outline on the tile at (row, col). Never moves it.
+    function displayHint(row, col) {
+
+        clearHint();
+
+        var pick = getGameBlock(row, col);
+
+        if (!pick) {
+            return;
+        }
+
+        var state = {
+            el: pick,
+            timer: null,
+            outline: pick.style.outline,
+            offset: pick.style.outlineOffset
+        };
+
+        hintState = state;
+
+        pick.style.outline = '3px solid #FFC83D';
+
+        pick.style.outlineOffset = '-3px';
+
+        var blink = 0;
+
+        state.timer = setInterval(function () {
+
+            blink++;
+
+            pick.style.outline =
+                (blink % 2 === 0)
+                    ? '3px solid #FFC83D'
+                    : '3px solid transparent';
+
+            if (blink >= 8) {
+
+                if (hintState === state) {
+                    clearHint();
+                } else {
+                    clearInterval(state.timer);
+                }
+            }
+
+        }, 200);
+    }
+
+
+    // ================================================================
+    // PUZZLE
+    // ================================================================
+
+    /*
+     * Exact starting arrangement of the current puzzle (taken right after
+     * the shuffle, before any move). Only initializeShuffledPuzzle() writes
+     * it; Replay only reads it, always through cloneState().
+     */
+
+    var originalPuzzleState = null;
+
+
+    function cloneState(state) {
+
+        var copy = [];
+
+        for (var r = 0; r < state.length; r++) {
+
+            copy[r] = state[r].slice();
+        }
+
+        return copy;
+    }
+
+
+    function createSolvedState() {
+
+        var rows = gameState.rows;
+
+        var cols = gameState.columns;
+
+        var state = [];
+
+        var id = 1;
+
+        for (var r = 0; r < rows; r++) {
+
+            state[r] = [];
+
+            for (var c = 0; c < cols; c++) {
+
+                if (r === 0 && c === 0) {
+                    state[r][c] = 0;
+                } else {
+                    state[r][c] = id++;
+                }
+            }
+        }
+
+        return state;
+    }
+
+
+    function shuffleState(state, numMoves) {
+
+        var rows = state.length;
+
+        var cols = state[0].length;
+
+        var emptyRow = 0;
+
+        var emptyCol = 0;
+
+        for (var r = 0; r < rows; r++) {
+
+            for (var c = 0; c < cols; c++) {
+
+                if (state[r][c] === 0) {
+
+                    emptyRow = r;
+
+                    emptyCol = c;
+
+                    break;
+                }
+            }
+        }
+
+        var lastDr = 0;
+
+        var lastDc = 0;
+
+        for (var i = 0; i < numMoves; i++) {
+
+            var moves = [];
+
+            var dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+            for (var d = 0; d < dirs.length; d++) {
+
+                var dr = dirs[d][0];
+
+                var dc = dirs[d][1];
+
+                var nr = emptyRow + dr;
+
+                var nc = emptyCol + dc;
+
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+
+                    if (dr === -lastDr && dc === -lastDc) {
+                        continue;
+                    }
+
+                    moves.push({ dr: dr, dc: dc, nr: nr, nc: nc });
+                }
+            }
+
+            if (!moves.length) {
+                break;
+            }
+
+            var move = moves[Math.floor(Math.random() * moves.length)];
+
+            state[emptyRow][emptyCol] = state[move.nr][move.nc];
+
+            state[move.nr][move.nc] = 0;
+
+            lastDr = move.dr;
+
+            lastDc = move.dc;
+
+            emptyRow = move.nr;
+
+            emptyCol = move.nc;
+        }
+
+        return state;
+    }
+
+
+    /*
+     * Places the PERSISTENT tile elements according to `state`.
+     * Nothing is destroyed or recreated; only grid positions and
+     * dataset coordinates are updated.
+     */
+
+    function renderFromState(state) {
+
+        ensureElements();
+
+        clearAnimationState();
+
+        animationLayer.innerHTML = '';
+
+        gameState.isAnimating = false;
+
+        var rows = state.length;
+
+        var cols = state[0].length;
+
+        var board = [];
+
+        for (var r = 0; r < rows; r++) {
+
+            board[r] = [];
+
+            for (var c = 0; c < cols; c++) {
+
+                var tileId = state[r][c];
+
+                var el = (tileId === 0) ? emptyEl : tileEls[tileId];
+
+                el.style.gridRow = r + 1;
+
+                el.style.gridColumn = c + 1;
+
+                el.dataset.row = r + 1;
+
+                el.dataset.column = c + 1;
+
+                if (tileId === 0) {
+
+                    board[r][c] = null;
+
+                    gameState.emptyRow = r + 1;
+
+                    gameState.emptyCol = c + 1;
+
+                } else {
+
+                    board[r][c] = el;
+                }
+            }
+        }
+
+        gameState.board = board;
+
+        updateTappableHints();
+    }
+
+
+    function initializeShuffledPuzzle() {
+
+        var solved = createSolvedState();
+
+        var shuffleCount = Math.max(150, gameState.rows * gameState.columns * 4);
+
+        var shuffled = shuffleState(solved, shuffleCount);
+
+        var attempts = 0;
+
+        while (isGoalState(shuffled) && attempts < 5) {
+
+            shuffled = shuffleState(createSolvedState(), shuffleCount);
+
+            attempts++;
+        }
+
+        // Keep a separate deep copy of the starting arrangement for Replay.
+        originalPuzzleState = cloneState(shuffled);
+
+        hintPlan = null;
+
+        renderFromState(shuffled);
+    }
+
+
+    function isGoalState(state) {
+
+        var goal = createSolvedState();
+
+        var rows = state.length;
+
+        var cols = state[0].length;
+
+        for (var r = 0; r < rows; r++) {
+
+            for (var c = 0; c < cols; c++) {
+
+                if (state[r][c] !== goal[r][c]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    function resetGame() {
+
+        if (isViewMode) {
+
+            isViewMode = false;
+
+            updateViewMode();
+        }
+
+        clearAnimationState();
+
+        stopTimer();
+
+        gameState.elapsedSeconds = 0;
+
+        gameState.emptyRow = 1;
+
+        gameState.emptyCol = 1;
+
+        updateTimerDisplay();
+
+        renderGameWorld();
+
+        scheduleBoardSize();
+
+        hideRewardPopup();
+
+        startTimer();
+    }
+
+
+    // ================================================================
+    // TIMER
+    // ================================================================
+
+    function formatTime(seconds) {
+
+        var m = Math.floor(seconds / 60);
+
+        var s = seconds % 60;
+
+        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+
+    function updateTimerDisplay() {
+
+        var tv = document.querySelector('#timerDisplay .time-value');
+
+        if (tv) {
+            tv.textContent = formatTime(gameState.elapsedSeconds);
+        }
+    }
+
+
+    function updateCoinDisplay() {
+
+        if (coinDisplay) {
+            coinDisplay.textContent = formatCoinDisplay(gameState.coins);
+        }
+    }
+
+
+    function updateDiamondDisplay() {
+
+        if (diamondDisplay) {
+            diamondDisplay.textContent = formatCoinDisplay(gameState.diamonds);
+        }
+    }
+
+
+    function showRewardPopup() {
+
+        rewardOverlay.classList.add('active');
+    }
+
+
+    function hideRewardPopup() {
+
+        rewardOverlay.classList.remove('active');
+    }
+
+
+    function startTimer() {
+
+        if (gameState.timerInterval) {
+
+            clearInterval(gameState.timerInterval);
+
+            gameState.timerInterval = null;
+        }
+
+        gameState.isRunning = true;
+
+        gameState.timerInterval = setInterval(function () {
+
+            gameState.elapsedSeconds += 1;
+
+            updateTimerDisplay();
+
+            if (gameState.elapsedSeconds >= REWARD_COOLDOWN) {
+
+                stopTimer();
+
+                showRewardPopup();
+            }
+
+        }, 1000);
+    }
+
+
+    function stopTimer() {
+
+        gameState.isRunning = false;
+
+        if (gameState.timerInterval) {
+
+            clearInterval(gameState.timerInterval);
+
+            gameState.timerInterval = null;
+        }
+    }
+
+
+    function resetTimer() {
+
+        stopTimer();
+
+        gameState.elapsedSeconds = 0;
+
+        updateTimerDisplay();
+    }
+
+
+    function restartTimerAfterReward() {
+
+        hideRewardPopup();
+
+        resetTimer();
+
+        startTimer();
+    }
+
+
+    // ================================================================
+    // REWARD CLAIM
+    // ================================================================
+
+    function claimReward() {
+
+        if (rewardClaimBtn.disabled) {
+            return;
+        }
+
+        rewardClaimBtn.disabled = true;
+
+        if (
+            !window.__backend ||
+            typeof window.__backend.addRewardCoin !== 'function'
+        ) {
+
+            console.error('Backend reward function not available.');
+
+            rewardClaimBtn.disabled = false;
+
+            return;
+        }
+
+        window.__backend
+            .addRewardCoin()
+
+            .then(function () {
+
+                /*
+                 * Coin is NOT changed here. The Firebase module fetches the
+                 * authoritative coin balance once after the backend write.
+                 */
+
+                restartTimerAfterReward();
+            })
+
+            .catch(function (err) {
+
+                console.error(
+                    'Reward claim failed:',
+                    err && err.message ? err.message : err
+                );
+            })
+
+            .finally(function () {
+
+                setTimeout(function () {
+
+                    rewardClaimBtn.disabled = false;
+
+                }, 600);
+            });
+    }
+
+
+    function dismissRewardPopup() {
+
+        restartTimerAfterReward();
+    }
+
+
+    rewardClaimBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        claimReward();
+    });
+
+
+    continueBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        dismissRewardPopup();
+    });
+
+
+    // ================================================================
+    // ANIMATION STATE
+    // ================================================================
+
+    function clearAnimationState() {
+
+        clearHint();
+
+        if (gameState.animTimeout) {
+
+            clearTimeout(gameState.animTimeout);
+
+            gameState.animTimeout = null;
+        }
+
+        // If a tile is mid-slide, snap it cleanly (no DOM removal).
+        if (gameState.activeMove) {
+
+            var el = gameState.activeMove;
+
+            el.style.transition = 'none';
+
+            el.style.transform = '';
+
+            el.style.zIndex = '';
+
+            gameState.activeMove = null;
+        }
+
+        animationLayer.innerHTML = '';
+
+        gameState.isAnimating = false;
+    }
+
+
+    function renderGameWorld() {
+
+        if (isViewMode) {
+
+            isViewMode = false;
+
+            updateViewMode();
+        }
+
+        // Solved layout with the empty slot at (1,1), reusing the same elements.
+        renderFromState(createSolvedState());
+    }
+
+
+    // ================================================================
+    // BOARD SIZE
+    // ================================================================
+
+    function calculateBoardSize() {
+
+        var wrapRect = gameAreaWrap.getBoundingClientRect();
+
+        var wrapStyle = getComputedStyle(gameAreaWrap);
+
+        var padX = parseFloat(wrapStyle.paddingLeft) + parseFloat(wrapStyle.paddingRight);
+
+        var padY = parseFloat(wrapStyle.paddingTop) + parseFloat(wrapStyle.paddingBottom);
+
+        var availWidth = wrapRect.width - padX;
+
+        var availHeight = wrapRect.height - padY;
+
+        var cols = gameState.columns;
+
+        var rows = gameState.rows;
+
+        var cellFromWidth = availWidth / cols;
+
+        var cellFromHeight = availHeight / rows;
+
+        var cellSize = Math.min(cellFromWidth, cellFromHeight);
+
+        cellSize = Math.floor(cellSize);
+
+        if (cellSize < 1) {
+            cellSize = 1;
+        }
+
+        return {
+            cellSize: cellSize,
+            boardWidth: cellSize * cols,
+            boardHeight: cellSize * rows
+        };
+    }
+
+
+    function applyBoardSize() {
+
+        var size = calculateBoardSize();
+
+        var cellSize = size.cellSize;
+
+        gameState.cellSize = cellSize;
+
+        boardContainer.style.width = size.boardWidth + 'px';
+
+        boardContainer.style.height = size.boardHeight + 'px';
+
+        gameArea.style.gridTemplateColumns =
+            'repeat(' + gameState.columns + ', ' + cellSize + 'px)';
+
+        gameArea.style.gridTemplateRows =
+            'repeat(' + gameState.rows + ', ' + cellSize + 'px)';
+
+        var allBlocks = gameArea.querySelectorAll('.game-block');
+
+        for (var i = 0; i < allBlocks.length; i++) {
+
+            allBlocks[i].style.width = cellSize + 'px';
+
+            allBlocks[i].style.height = cellSize + 'px';
+        }
+    }
+
+
+    function scheduleBoardSize() {
+
+        if (gameState.resizePending) {
+            return;
+        }
+
+        gameState.resizePending = true;
+
+        requestAnimationFrame(function () {
+
+            applyBoardSize();
+
+            gameState.resizePending = false;
+        });
+    }
+
+
+    var resizeObserver = new ResizeObserver(function () {
+
+        scheduleBoardSize();
+    });
+
+
+    function initLayout() {
+
+        resizeObserver.observe(gameAreaWrap);
+
+        window.addEventListener('resize', scheduleBoardSize);
+
+        window.addEventListener('orientationchange', function () {
+
+            setTimeout(scheduleBoardSize, 300);
+        });
+
+        scheduleBoardSize();
+    }
+
+
+    // ================================================================
+    // TOUCH
+    // ================================================================
+
+    var touchStartX = 0;
+
+    var touchStartY = 0;
+
+    var touchStartTime = 0;
+
+    var isSwiping = false;
+
+
+    gameAreaWrap.addEventListener('touchstart', function (e) {
+
+        var touch = e.touches[0];
+
+        touchStartX = touch.clientX;
+
+        touchStartY = touch.clientY;
+
+        touchStartTime = Date.now();
+
+        isSwiping = false;
+
+    }, { passive: true });
+
+
+    gameAreaWrap.addEventListener('touchmove', function (e) {
+
+        if (e.touches.length !== 1) {
+            return;
+        }
+
+        var touch = e.touches[0];
+
+        var dx = touch.clientX - touchStartX;
+
+        var dy = touch.clientY - touchStartY;
+
+        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+            isSwiping = true;
+        }
+
+    }, { passive: true });
+
+
+    gameAreaWrap.addEventListener('touchend', function (e) {
+
+        if (!isSwiping) {
+            return;
+        }
+
+        var dt = Date.now() - touchStartTime;
+
+        if (dt > 400) {
+            return;
+        }
+
+        var touch = e.changedTouches[0];
+
+        var dx = touch.clientX - touchStartX;
+
+        var dy = touch.clientY - touchStartY;
+
+        var absDx = Math.abs(dx);
+
+        var absDy = Math.abs(dy);
+
+        if (Math.max(absDx, absDy) < 30) {
+            return;
+        }
+
+        var er = gameState.emptyRow;
+
+        var ec = gameState.emptyCol;
+
+        var targetRow = er;
+
+        var targetCol = ec;
+
+        if (absDx > absDy) {
+
+            targetCol = dx > 0 ? ec - 1 : ec + 1;
+
+        } else {
+
+            targetRow = dy > 0 ? er - 1 : er + 1;
+        }
+
+        if (
+            targetRow < 1 ||
+            targetRow > gameState.rows ||
+            targetCol < 1 ||
+            targetCol > gameState.columns
+        ) {
+            return;
+        }
+
+        tryMoveBlock(targetRow, targetCol);
+
+    }, { passive: true });
+
+
+    // ================================================================
+    // KEYBOARD
+    // ================================================================
+
+    document.addEventListener('keydown', function (e) {
+
+        var er = gameState.emptyRow;
+
+        var ec = gameState.emptyCol;
+
+        var targetRow = er;
+
+        var targetCol = ec;
+
+        switch (e.key) {
+
+            case 'ArrowUp':
+                targetRow = er + 1;
+                break;
+
+            case 'ArrowDown':
+                targetRow = er - 1;
+                break;
+
+            case 'ArrowLeft':
+                targetCol = ec + 1;
+                break;
+
+            case 'ArrowRight':
+                targetCol = ec - 1;
+                break;
+
+            default:
+                return;
+        }
+
+        if (
+            targetRow < 1 ||
+            targetRow > gameState.rows ||
+            targetCol < 1 ||
+            targetCol > gameState.columns
+        ) {
+            return;
+        }
+
+        e.preventDefault();
+
+        tryMoveBlock(targetRow, targetCol);
+    });
+
+
+    // ================================================================
+    // GAME MOVEMENT
+    // ================================================================
+
+    function getGameBlock(row, column) {
+
+        return (
+            gameState.board[row - 1] &&
+            gameState.board[row - 1][column - 1]
+        )
+            ? gameState.board[row - 1][column - 1]
+            : null;
+    }
+
+
+    function tryMoveBlock(row, col) {
+
+        if (!gameState.tilesReady || gameState.isAnimating || hintBusy) {
+            return;
+        }
+
+        var er = gameState.emptyRow;
+
+        var ec = gameState.emptyCol;
+
+        var rowDiff = Math.abs(row - er);
+
+        var colDiff = Math.abs(col - ec);
+
+        if (rowDiff + colDiff !== 1) {
+            return;
+        }
+
+        if (row === er && col === ec) {
+            return;
+        }
+
+        executeMove(row, col);
+    }
+
+
+    /*
+     * Flicker-free move: the REAL tile element is animated with a
+     * transform transition (no clone, no visibility toggling, no DOM
+     * removal). When the transition ends, the transform is cleared and
+     * the grid cell is updated in the same synchronous step, so the
+     * browser paints exactly one consistent frame.
+     */
+
+    function executeMove(row, col) {
+
+        if (gameState.isAnimating) {
+            return;
+        }
+
+        var er = gameState.emptyRow;
+
+        var ec = gameState.emptyCol;
+
+        var srcRow = row;
+
+        var srcCol = col;
+
+        var movingBlock = getGameBlock(srcRow, srcCol);
+
+        if (!movingBlock || !emptyEl) {
+            return;
+        }
+
+        gameState.isAnimating = true;
+
+        // The player acted: drop any highlight (it may now be stale).
+        clearHint();
+
+        var srcRect = movingBlock.getBoundingClientRect();
+
+        var dstRect = emptyEl.getBoundingClientRect();
+
+        var dx = dstRect.left - srcRect.left;
+
+        var dy = dstRect.top - srcRect.top;
+
+        gameState.activeMove = movingBlock;
+
+        movingBlock.style.zIndex = '10';
+
+        movingBlock.style.transition = 'transform 200ms ease-out';
+
+        // Commit the starting style before changing the transform.
+        void movingBlock.offsetWidth;
+
+        movingBlock.style.transform = 'translate3d(' + dx + 'px, ' + dy + 'px, 0)';
+
+        var completed = false;
+
+        function finishMove() {
+
+            if (completed) {
+                return;
+            }
+
+            completed = true;
+
+            if (gameState.animTimeout) {
+
+                clearTimeout(gameState.animTimeout);
+
+                gameState.animTimeout = null;
+            }
+
+            movingBlock.removeEventListener('transitionend', onTransitionEnd);
+
+            // All of the following happens synchronously => one paint.
+            movingBlock.style.transition = 'none';
+
+            movingBlock.style.transform = '';
+
+            movingBlock.style.zIndex = '';
+
+            gameState.board[srcRow - 1][srcCol - 1] = null;
+
+            gameState.board[er - 1][ec - 1] = movingBlock;
+
+            movingBlock.style.gridRow = er;
+
+            movingBlock.style.gridColumn = ec;
+
+            movingBlock.dataset.row = er;
+
+            movingBlock.dataset.column = ec;
+
+            emptyEl.style.gridRow = srcRow;
+
+            emptyEl.style.gridColumn = srcCol;
+
+            emptyEl.dataset.row = srcRow;
+
+            emptyEl.dataset.column = srcCol;
+
+            gameState.emptyRow = srcRow;
+
+            gameState.emptyCol = srcCol;
+
+            gameState.activeMove = null;
+
+            updateTappableHints();
+
+            gameState.isAnimating = false;
+        }
+
+        function onTransitionEnd(event) {
+
+            if (event.target === movingBlock && event.propertyName === 'transform') {
+                finishMove();
+            }
+        }
+
+        movingBlock.addEventListener('transitionend', onTransitionEnd);
+
+        gameState.animTimeout = setTimeout(finishMove, 280);
+    }
+
+
+    function findEmptyElement() {
+
+        return emptyEl;
+    }
+
+
+    function updateTappableHints() {
+
+        var allBlocks = gameArea.querySelectorAll('.game-block.tappable');
+
+        for (var i = 0; i < allBlocks.length; i++) {
+
+            allBlocks[i].classList.remove('tappable');
+        }
+
+        var er = gameState.emptyRow;
+
+        var ec = gameState.emptyCol;
+
+        var directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+        for (var d = 0; d < directions.length; d++) {
+
+            var nr = er + directions[d][0];
+
+            var nc = ec + directions[d][1];
+
+            if (nr >= 1 && nr <= gameState.rows && nc >= 1 && nc <= gameState.columns) {
+
+                var block = getGameBlock(nr, nc);
+
+                if (block) {
+                    block.classList.add('tappable');
+                }
+            }
+        }
+    }
+
+
+    // ================================================================
+    // HOME
+    // ================================================================
+
+    var isPageTransitionRunning = false;
+
+    var appContainer = document.querySelector('.app');
+
+
+    homeBtn.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        if (isPageTransitionRunning) {
+            return;
+        }
+
+        isPageTransitionRunning = true;
+
+        homeBtn.classList.add('pressed');
+
+        setTimeout(function () {
+
+            homeBtn.classList.remove('pressed');
+
+            appContainer.classList.add('slide-out');
+
+            setTimeout(function () {
+
+                window.location.href = 'home.html';
+
+            }, 500);
+
+        }, 100);
+    });
+
+
+    // ================================================================
+    // INITIAL GAME
+    // ================================================================
+
+    function startPuzzleWhenReady() {
+
+        setBoardStatus('Loading puzzle…');
+
+        // Try the saved picture, then fall back to the default picture.
+        return setPicture(currentPicture)
+
+            .catch(function (err) {
+
+                console.error('Picture failed, trying default:', err);
+
+                if (currentPicture === DEFAULT_PICTURE) {
+                    throw err;
+                }
+
+                currentPicture = DEFAULT_PICTURE;
+
+                return setPicture(currentPicture);
+            })
+
+            .then(function () {
+
+                gameState.tilesReady = true;
+
+                setBoardStatus('');
+
+                updateTimerDisplay();
+
+                initializeShuffledPuzzle();
+
+                scheduleBoardSize();
+
+                startTimer();
+            })
+
+            .catch(function (err) {
+
+                console.error('Puzzle image could not be prepared:', err);
+
+                setBoardStatus(
+                    'Could not load the puzzle image. Tap to retry.',
+                    startPuzzleWhenReady
+                );
+            });
+    }
+
+
+    function init() {
+
+        // Make sure LocalStorage holds the full structure
+        // { coin, diamond, power: {...} } before anything is displayed.
+        ensureUserDataStructure();
+
+        var data = getUserData();
+
+        // Legacy diamond migration
+        try {
+
+            var legacyDiamond = localStorage.getItem('userdiamonddata');
+
+            if (
+                legacyDiamond &&
+                (typeof data.diamond !== 'number' || !Number.isFinite(data.diamond) || data.diamond === 0)
+            ) {
+
+                var legacyParsed = JSON.parse(legacyDiamond);
+
+                if (
+                    legacyParsed &&
+                    typeof legacyParsed.diamond === 'number' &&
+                    Number.isFinite(legacyParsed.diamond) &&
+                    legacyParsed.diamond > 0
+                ) {
+
+                    data.diamond = Math.max(0, Math.floor(legacyParsed.diamond));
+
+                    saveUserData(data);
+                }
+            }
+
+            localStorage.removeItem('userdiamonddata');
+
+        } catch (e) {
+            // Ignore migration error.
+        }
+
+        data = getUserData();
+
+        // 1. Show LocalStorage data IMMEDIATELY (no waiting for Firebase).
+
+        // Initial coin
+        var localCoin =
+            (typeof data.coin === 'number' && Number.isFinite(data.coin))
+                ? Math.max(0, Math.floor(data.coin))
+                : 0;
+
+        gameState.coins = localCoin;
+
+        updateCoinDisplay();
+
+        // Initial diamond
+        var localDiamond =
+            (typeof data.diamond === 'number' && Number.isFinite(data.diamond))
+                ? Math.max(0, Math.floor(data.diamond))
+                : 0;
+
+        gameState.diamonds = localDiamond;
+
+        updateDiamondDisplay();
+
+        // Picture
+        currentPicture = getLocalPicture();
+
+        // Power from LocalStorage (Firebase replaces it once, after load).
+        setGamePowerFrom(data.power);
+
+        // Layout first so tiles get the right size as soon as they exist.
+        initLayout();
+
+        viewIcon.src = 'picture_resource/icon/off_view.png';
+
+        if (isViewMode) {
+            updateViewMode();
+        }
+
+        // Preload all 16 tiles, then shuffle + start the timer.
+        startPuzzleWhenReady();
+
+        // Cross-tab sync (LocalStorage is the shared cache)
+        window.addEventListener('storage', function (e) {
+
+            if (e.key !== USER_DATA_KEY) {
+                return;
+            }
+
+            var fresh = getUserData();
+
+            // Diamond cache
+            var freshDiamond =
+                (typeof fresh.diamond === 'number' && Number.isFinite(fresh.diamond))
+                    ? Math.max(0, Math.floor(fresh.diamond))
+                    : 0;
+
+            if (freshDiamond !== gameState.diamonds) {
+
+                gameState.diamonds = freshDiamond;
+
+                updateDiamondDisplay();
+            }
+
+            // Power cache (another tab consumed or received power)
+            setGamePowerFrom(fresh.power);
+
+            // Picture cache
+            var freshPic = getLocalPicture();
+
+            if (freshPic !== currentPicture) {
+
+                currentPicture = freshPic;
+
+                applyPictureToDOM();
+            }
+        });
+    }
+
+
+    // ================================================================
+    // PUBLIC GAME API
+    // ================================================================
+
+    window.__game = {
+
+        state: gameState,
+
+        /* Same object as gamePower; mirrors LocalStorage power. */
+        power: gamePower,
+
+        isViewMode: isViewMode,
+
+        toggleViewMode: toggleViewMode,
+
+        startTimer: startTimer,
+
+        stopTimer: stopTimer,
+
+        resetTimer: resetTimer,
+
+        resetGame: resetGame,
+
+        renderGameWorld: renderGameWorld,
+
+        renderFromState: renderFromState,
+
+        getGameBlock: getGameBlock,
+
+        tryMoveBlock: tryMoveBlock,
+
+        updateTimerDisplay: updateTimerDisplay,
+
+        updateCoinDisplay: updateCoinDisplay,
+
+        updateDiamondDisplay: updateDiamondDisplay,
+
+        scheduleBoardSize: scheduleBoardSize,
+
+        applyBoardSize: applyBoardSize,
+
+        formatCoinDisplay: formatCoinDisplay,
+
+        updatePowerBadges: updatePowerBadges,
+
+        reward: {
+
+            claim: claimReward,
+
+            dismiss: dismissRewardPopup
+
+        },
+
+        shuffle: {
+
+            createSolvedState: createSolvedState,
+
+            shuffleState: shuffleState,
+
+            initializeShuffledPuzzle: initializeShuffledPuzzle
+
+        },
+
+        getSessionFromABC: function () {
+            return {};
+        },
+
+        getDeveloperCoins: function () {
+            return { totalCoins: gameState.coins };
+        },
+
+        saveDeveloperCoins: function () {
+            // Disabled.
+        },
+
+        updateDeveloperCoins: function () {
+            console.warn('updateDeveloperCoins DISABLED — backend-only writes.');
+            return gameState.coins;
+        },
+
+        setDeveloperCoins: function () {
+            console.warn('setDeveloperCoins DISABLED — backend-only writes.');
+            return gameState.coins;
+        },
+
+        getTotalCoins: function () {
+            return gameState.coins;
+        }
+    };
+
+
+    // ================================================================
+    // START
+    // ================================================================
+
+    init();
+
+})();
+</script>
+</body>
+</html>

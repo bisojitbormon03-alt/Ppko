@@ -1,0 +1,2801 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#16293F" />
+  <title>TileUp – Login</title>
+
+  <style>
+    :root {
+      --theme: #213C5E;
+      --theme-deep: #16293F;
+      --theme-deeper: #0F1E30;
+      --theme-soft: #2C4E76;
+      --theme-softer: #35597F;
+      --text-primary: #F4F7FB;
+      --text-secondary: #B6C6D9;
+      --text-muted: #7E93A9;
+      --text-placeholder: #6D8399;
+      --border-input: var(--theme-softer);
+      --success: #10b981;
+      --danger: #ef4444;
+      --loading-accent: #64D2FA;
+      --google-blue: #4285F4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--theme-deeper);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+      transition: background 0.2s ease;
+    }
+
+    /* LOADING */
+
+    .loading-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(100, 210, 250, 0.15);
+      border-top-color: #64D2FA;
+      border-right-color: #64D2FA;
+      animation: tileup-spin 0.85s linear infinite;
+      will-change: transform;
+      box-shadow: 0 0 12px rgba(100, 210, 250, 0.18);
+    }
+
+    @keyframes tileup-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-container.auth-loading .loading-spinner {
+      animation: tileup-spin 0.85s linear infinite,
+        tileup-glow 1.6s ease-in-out infinite;
+    }
+
+    @keyframes tileup-glow {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(100, 210, 250, 0.18);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(100, 210, 250, 0.38);
+      }
+    }
+
+    /* APP CONTAINER */
+
+    .app-container {
+      width: 100%;
+      max-width: 400px;
+      min-height: 100vh;
+      background: var(--theme-deep);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px;
+      position: relative;
+      transition: transform 0.5s ease-in-out;
+      border-radius: 0;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .app-container.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .app-container.slide-out {
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+
+    /* TOP SECTION */
+
+    .top-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .app-icon img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .app-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .welcome-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .subtitle-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 260px;
+      font-weight: 400;
+    }
+
+    /* INPUTS */
+
+    .gmail-wrapper,
+    .password-wrapper,
+    .name-wrapper {
+      width: 100%;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 56px;
+      padding: 0 16px;
+      border: 1px solid var(--border-input);
+      border-radius: 14px;
+      font-size: 16px;
+      color: #F4F7FB;
+      -webkit-text-fill-color: #F4F7FB;
+      background: #213C5E;
+      background-color: #213C5E;
+      color-scheme: dark;
+      caret-color: #64D2FA;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--theme-softer);
+      box-shadow: 0 0 0 3px rgba(53, 89, 127, 0.35);
+      background-color: #213C5E;
+    }
+
+    .input-field::placeholder {
+      color: #6D8399;
+      -webkit-text-fill-color: #6D8399;
+      opacity: 1;
+    }
+
+    .input-field:-webkit-autofill,
+    .input-field:-webkit-autofill:hover,
+    .input-field:-webkit-autofill:focus,
+    .input-field:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #213C5E inset !important;
+      box-shadow: 0 0 0 1000px #213C5E inset !important;
+      -webkit-text-fill-color: #F4F7FB !important;
+      color: #F4F7FB !important;
+      caret-color: #64D2FA !important;
+      background-color: #213C5E !important;
+      border-color: var(--theme-softer);
+    }
+
+    .input-field:-webkit-autofill:focus {
+      border-color: var(--theme-softer);
+      box-shadow:
+        0 0 0 1000px #213C5E inset,
+        0 0 0 3px rgba(53, 89, 127, 0.35) !important;
+    }
+
+    /* INPUT ICONS */
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+      pointer-events: none;
+      z-index: 2;
+      transition: color 0.2s ease;
+    }
+
+    .input-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .gmail-wrapper .input-field,
+    .password-wrapper .input-field,
+    .name-wrapper .input-field {
+      padding-left: 48px;
+    }
+
+    .password-input {
+      padding-right: 52px;
+    }
+
+    .gmail-wrapper:focus-within .input-icon,
+    .password-wrapper:focus-within .input-icon,
+    .name-wrapper:focus-within .input-icon {
+      color: var(--text-primary);
+    }
+
+    /* PASSWORD TOGGLE */
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--text-muted);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, background-color 0.2s;
+      z-index: 3;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+      background: var(--theme-soft);
+    }
+
+    .password-toggle svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* NAME VALIDATION */
+
+    .name-error {
+      width: 100%;
+      color: var(--danger);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: -9px;
+      margin-bottom: 14px;
+      padding-left: 4px;
+    }
+
+    /* AUTH ERROR */
+
+    .auth-error {
+      width: 100%;
+      color: var(--danger);
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.5;
+      margin: 0 0 14px;
+      padding: 0 4px;
+    }
+
+    /* LOGIN BUTTON */
+
+    .btn-login {
+      width: 100%;
+      height: 56px;
+      background: #64D2FA;
+      border: 1px solid #8ADFFF;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #0756B8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      box-shadow: 0 2px 8px rgba(100, 210, 250, 0.22);
+      transition: background 0.25s, color 0.25s,
+        border-color 0.25s, transform 0.2s,
+        box-shadow 0.25s, opacity 0.25s;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      background: #8ADFFF;
+      border-color: #B5EDFF;
+      color: #064B9F;
+      box-shadow: 0 4px 16px rgba(100, 210, 250, 0.32);
+    }
+
+    .btn-login:active:not(:disabled) {
+      transform: scale(0.97);
+      background: #4FC5EF;
+    }
+
+    .btn-login:disabled {
+      background: #A9D7E8;
+      color: #5F7890;
+      border-color: #B9E2EF;
+      box-shadow: none;
+      opacity: 0.58;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-login .email-button-icon {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
+      flex-shrink: 0;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    .btn-login span {
+      line-height: 1.2;
+    }
+
+    /* EMAIL SWITCH */
+
+    .email-switch-line {
+      width: 100%;
+      margin-top: 13px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .email-switch-link {
+      display: inline;
+      padding: 0;
+      margin-left: 3px;
+      border: 0;
+      background: transparent;
+      color: #64D2FA;
+      font-size: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .email-switch-link:hover:not(:disabled) {
+      color: #8ADFFF;
+      text-decoration: underline;
+    }
+
+    .email-switch-link:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* GOOGLE BUTTON */
+
+    .btn-google {
+      width: 100%;
+      height: 56px;
+      background: transparent;
+      border: 1px solid var(--theme-softer);
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, border-color 0.2s,
+        transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      margin-bottom: 0;
+      position: relative;
+      box-shadow: none;
+    }
+
+    .btn-google:hover:not(:disabled) {
+      background: transparent;
+      border-color: var(--theme-softer);
+      box-shadow: none;
+    }
+
+    .btn-google:active:not(:disabled) {
+      transform: scale(0.97);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .btn-google:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .google-icon {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 22px;
+    }
+
+    .google-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* DIVIDER */
+
+    .auth-divider {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 16px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      display: block;
+      flex: 1;
+      min-width: 0;
+      height: 1px;
+      background: var(--theme-softer);
+    }
+
+    .auth-divider span {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    /* EMAIL ENTRY */
+
+    .btn-email-entry {
+      width: 100%;
+      height: 56px;
+      background: transparent;
+      border: 1px solid var(--theme-softer);
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, border-color 0.2s,
+        transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      margin-bottom: 16px;
+      position: relative;
+      box-shadow: none;
+    }
+
+    .btn-email-entry:hover:not(:disabled) {
+      background: transparent;
+      border-color: var(--theme-softer);
+      box-shadow: none;
+    }
+
+    .btn-email-entry:active:not(:disabled) {
+      transform: scale(0.97);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .btn-email-entry:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .email-entry-icon {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      flex-shrink: 0;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* GOOGLE SWITCH */
+
+    .google-switch-line {
+      width: 100%;
+      margin-top: 5px;
+      margin-bottom: 18px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .google-switch-link {
+      display: inline;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--google-blue);
+      font-size: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .google-switch-link:hover {
+      color: #78A9FF;
+      text-decoration: underline;
+    }
+
+    .google-switch-link:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* INTERNET STATUS */
+
+    .internet-status-message {
+      width: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--danger);
+      text-align: center;
+      line-height: 1.4;
+      margin-top: -4px;
+      margin-bottom: 16px;
+      padding: 0 4px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .internet-status-message.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    .internet-status-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    .internet-status-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* BOTTOM */
+
+    .bottom-info {
+      margin-top: auto;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      padding-top: 20px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (min-width: 401px) {
+      .app-container {
+        border-radius: 28px;
+        margin: 24px;
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .app-container {
+        padding: 28px 18px;
+      }
+
+      .app-title { font-size: 24px; }
+      .welcome-text { font-size: 18px; }
+      .subtitle-text { font-size: 14px; }
+
+      .btn-login,
+      .input-field,
+      .btn-google,
+      .btn-email-entry {
+        height: 50px;
+        font-size: 15px;
+      }
+
+      .btn-login .email-button-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+      }
+
+      .password-toggle {
+        width: 36px;
+        height: 36px;
+      }
+
+      .password-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .password-input { padding-right: 48px; }
+
+      .google-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+      }
+
+      .email-entry-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+      }
+
+      .input-icon {
+        width: 19px;
+        height: 19px;
+        left: 14px;
+      }
+
+      .gmail-wrapper .input-field,
+      .password-wrapper .input-field,
+      .name-wrapper .input-field {
+        padding-left: 44px;
+      }
+
+      .auth-divider {
+        gap: 10px;
+        margin: 14px 0;
+        font-size: 13px;
+      }
+
+      .internet-status-message { font-size: 12px; }
+
+      .loading-spinner {
+        width: 42px;
+        height: 42px;
+        border-width: 3px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOADING -->
+
+  <div class="loading-container" id="loadingContainer">
+    <div class="loading-spinner" aria-label="Loading" role="status"></div>
+  </div>
+
+  <!-- APP -->
+
+  <div class="app-container" id="appContainer">
+
+    <div class="top-section">
+
+      <div class="app-icon">
+        <img src="picture/app_icon.png" alt="TileUp" />
+      </div>
+
+      <h1 class="app-title">TileUp</h1>
+      <h2 class="welcome-text">Welcome</h2>
+
+      <p class="subtitle-text">
+        Choose how you want to continue
+      </p>
+
+    </div>
+
+    <!-- NAME -->
+
+    <div class="name-wrapper" id="nameWrapper" hidden>
+
+      <span class="input-icon" aria-hidden="true">
+        <img
+          src="picture_resource/icon/profile.png"
+          alt=""
+          aria-hidden="true"
+          style="width: 100%; height: 100%; display: block; object-fit: contain;"
+        />
+      </span>
+
+      <input
+        type="text"
+        id="nameInput"
+        class="input-field"
+        placeholder="Enter your Name"
+        autocomplete="name"
+        maxlength="20"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+
+    </div>
+
+    <p class="name-error" id="nameError" hidden></p>
+
+    <!-- GMAIL -->
+
+    <div class="gmail-wrapper" id="gmailWrapper" hidden>
+
+      <span class="input-icon email-icon" aria-hidden="true">
+        <img
+          src="picture_resource/icon/email_2.png"
+          alt=""
+          aria-hidden="true"
+          style="width: 100%; height: 100%; display: block; object-fit: contain;"
+        />
+      </span>
+
+      <input
+        type="email"
+        id="gmailInput"
+        class="input-field"
+        placeholder="Enter your Gmail"
+        autocomplete="email"
+        maxlength="50"
+      />
+
+    </div>
+
+    <!-- PASSWORD -->
+
+    <div class="password-wrapper" id="passwordWrapper" hidden>
+
+      <span class="input-icon lock-icon" aria-hidden="true">
+        <img
+          src="picture_resource/icon/lock.png"
+          alt=""
+          aria-hidden="true"
+          style="width: 100%; height: 100%; display: block; object-fit: contain;"
+        />
+      </span>
+
+      <input
+        type="password"
+        id="passwordInput"
+        class="input-field password-input"
+        placeholder="Enter your Password"
+        autocomplete="current-password"
+        maxlength="30"
+      />
+
+      <button
+        type="button"
+        class="password-toggle"
+        aria-label="Show password"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- EMAIL LOGIN / SIGN UP BUTTON -->
+
+    <button class="btn-login" id="loginBtn" type="button" hidden disabled>
+
+      <img
+        class="email-button-icon"
+        src="picture_resource/icon/email_1.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <span id="loginBtnText">Login with Email</span>
+
+    </button>
+
+    <!-- EMAIL SWITCH -->
+
+    <p class="email-switch-line" id="emailSwitchLine" hidden>
+      <span id="emailSwitchText">Don't have an account?</span>
+
+      <button
+        type="button"
+        class="email-switch-link"
+        id="emailSwitchBtn"
+      >Sign Up</button>
+    </p>
+
+    <!-- GOOGLE BUTTON -->
+
+    <button class="btn-google" id="googleLoginBtn" type="button">
+
+      <span class="google-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+          <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+          <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+          <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+        </svg>
+      </span>
+
+      <span>Continue with Google</span>
+
+    </button>
+
+    <!-- DIVIDER -->
+
+    <div class="auth-divider" role="separator" aria-label="Or">
+      <span>OR</span>
+    </div>
+
+    <!-- EMAIL ENTRY -->
+
+    <button
+      class="btn-email-entry"
+      id="emailEntryBtn"
+      type="button"
+    >
+
+      <img
+        class="email-entry-icon"
+        src="picture_resource/icon/email_1.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <span>Continue with Email</span>
+
+    </button>
+
+    <!-- GOOGLE SWITCH -->
+
+    <p class="google-switch-line" id="googleSwitchLine" hidden>
+      Want to continue with
+
+      <button
+        type="button"
+        class="google-switch-link"
+        id="googleSwitchBtn"
+      >Google?</button>
+    </p>
+
+    <!-- ERROR MESSAGE -->
+
+    <p
+      class="auth-error"
+      id="authError"
+      role="alert"
+      aria-live="assertive"
+      hidden
+    ></p>
+
+    <!-- INTERNET STATUS -->
+
+    <div
+      class="internet-status-message"
+      id="internetStatusMessage"
+      role="status"
+      aria-live="polite"
+    >
+
+      <span class="internet-status-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+          <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+      </span>
+
+      <span>
+        No internet connection. Please check your internet connection and try again.
+      </span>
+
+    </div>
+
+    <!-- BOTTOM -->
+
+    <div class="bottom-info">
+      Secure authentication for your TileUp account<br />
+      Your account information is protected
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+
+  <script type="module">
+
+    // =====================================================
+    // FIREBASE IMPORTS
+    // =====================================================
+
+    import { auth } from "./firebase.js";
+
+    import {
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
+
+    const BACKEND_URL =
+      "https://my-life-backend-2.onrender.com";
+
+    const GOOGLE_REGISTER_URL =
+      `${BACKEND_URL}/api/google/register`;
+
+    const LOCAL_STORAGE_KEY =
+      "userDatakv9688658vs";
+
+    // Use the same Firebase App as Firebase Authentication.
+
+    const db = getFirestore(auth.app);
+
+
+    // =====================================================
+    // DOM ELEMENTS
+    // =====================================================
+
+    const loadingContainer =
+      document.getElementById("loadingContainer");
+
+    const appContainer =
+      document.getElementById("appContainer");
+
+    const nameWrapper =
+      document.getElementById("nameWrapper");
+
+    const nameInput =
+      document.getElementById("nameInput");
+
+    const nameError =
+      document.getElementById("nameError");
+
+    const gmailWrapper =
+      document.getElementById("gmailWrapper");
+
+    const passwordWrapper =
+      document.getElementById("passwordWrapper");
+
+    const gmailInput =
+      document.getElementById("gmailInput");
+
+    const passwordInput =
+      document.getElementById("passwordInput");
+
+    const loginBtn =
+      document.getElementById("loginBtn");
+
+    const loginBtnText =
+      document.getElementById("loginBtnText");
+
+    const emailSwitchLine =
+      document.getElementById("emailSwitchLine");
+
+    const emailSwitchText =
+      document.getElementById("emailSwitchText");
+
+    const emailSwitchBtn =
+      document.getElementById("emailSwitchBtn");
+
+    const googleLoginBtn =
+      document.getElementById("googleLoginBtn");
+
+    const emailEntryBtn =
+      document.getElementById("emailEntryBtn");
+
+    const googleSwitchLine =
+      document.getElementById("googleSwitchLine");
+
+    const googleSwitchBtn =
+      document.getElementById("googleSwitchBtn");
+
+    const toggleBtn =
+      document.querySelector(".password-toggle");
+
+    const toggleIcon =
+      toggleBtn.querySelector("svg");
+
+    const internetStatusMessage =
+      document.getElementById("internetStatusMessage");
+
+    const authError =
+      document.getElementById("authError");
+
+
+    // =====================================================
+    // AUTHENTICATION STATE
+    // =====================================================
+
+    let authActionInProgress = false;
+
+    let emailMode = false;
+
+    let emailSignupMode = false;
+
+    let redirectHandled = false;
+
+    let googleRedirectStarted = false;
+
+    let homeRedirectStarted = false;
+
+    let verifiedGoogleUid = null;
+
+    // Prevent duplicate Google backend requests.
+
+    const googleRegistrationPromises = new Map();
+
+    // Prevent duplicate user-data fetching.
+
+    const userDataPromises = new Map();
+
+    // Prevent multiple authentication pipelines.
+
+    let activeAuthenticationPromise = null;
+
+
+    // =====================================================
+    // ERROR MANAGEMENT
+    // =====================================================
+
+    function showError(message) {
+      authError.textContent = message;
+      authError.hidden = false;
+    }
+
+    function hideError() {
+      authError.textContent = "";
+      authError.hidden = true;
+    }
+
+
+    // =====================================================
+    // EMAIL MODE MANAGEMENT
+    // =====================================================
+
+    function showEmailMode() {
+
+      if (authActionInProgress) return;
+
+      hideError();
+
+      emailMode = true;
+      emailSignupMode = false;
+
+      googleLoginBtn.hidden = true;
+      emailEntryBtn.hidden = true;
+
+      gmailWrapper.hidden = false;
+      passwordWrapper.hidden = false;
+
+      loginBtn.hidden = false;
+
+      emailSwitchLine.hidden = false;
+      googleSwitchLine.hidden = false;
+
+      updateEmailMode();
+
+      updateLoginButtonState();
+    }
+
+
+    function showInitialMode() {
+
+      if (authActionInProgress) return;
+
+      emailMode = false;
+      emailSignupMode = false;
+
+      nameWrapper.hidden = true;
+      nameError.hidden = true;
+
+      gmailWrapper.hidden = true;
+      passwordWrapper.hidden = true;
+
+      loginBtn.hidden = true;
+
+      emailSwitchLine.hidden = true;
+      googleSwitchLine.hidden = true;
+
+      googleLoginBtn.hidden = false;
+      emailEntryBtn.hidden = false;
+
+      updateLoginButtonState();
+    }
+
+
+    function updateEmailMode() {
+
+      if (authActionInProgress) return;
+
+      const isSignup = emailSignupMode;
+
+      nameWrapper.hidden = !isSignup;
+
+      if (!isSignup) {
+        nameError.hidden = true;
+      }
+
+      emailSwitchText.textContent = isSignup
+        ? "Already have an account?"
+        : "Don't have an account?";
+
+      emailSwitchBtn.textContent = isSignup
+        ? "Login"
+        : "Sign Up";
+
+      loginBtnText.textContent = isSignup
+        ? "Create Account"
+        : "Login with Email";
+
+      passwordInput.autocomplete = isSignup
+        ? "new-password"
+        : "current-password";
+
+      updateLoginButtonState();
+    }
+
+
+    emailSwitchBtn.addEventListener("click", () => {
+
+      if (authActionInProgress || !emailMode) {
+        return;
+      }
+
+      hideError();
+
+      emailSignupMode = !emailSignupMode;
+
+      updateEmailMode();
+    });
+
+
+    // =====================================================
+    // PASSWORD TOGGLE
+    // =====================================================
+
+    let passwordVisible = false;
+
+    const eyeClosed = `
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    `;
+
+    const eyeOpen = `
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    `;
+
+
+    function updateToggle(visible) {
+
+      toggleIcon.innerHTML = visible
+        ? eyeOpen
+        : eyeClosed;
+
+      toggleBtn.setAttribute(
+        "aria-label",
+        visible ? "Hide password" : "Show password"
+      );
+    }
+
+
+    toggleBtn.addEventListener("click", () => {
+
+      passwordVisible = !passwordVisible;
+
+      passwordInput.type =
+        passwordVisible ? "text" : "password";
+
+      updateToggle(passwordVisible);
+    });
+
+
+    // =====================================================
+    // INTERNET STATUS
+    // =====================================================
+
+    function updateInternetStatus() {
+
+      if (navigator.onLine) {
+        internetStatusMessage.classList.remove("visible");
+      } else {
+        internetStatusMessage.classList.add("visible");
+      }
+    }
+
+    window.addEventListener("online", updateInternetStatus);
+
+    window.addEventListener("offline", updateInternetStatus);
+
+
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    function isValidGmail(email) {
+
+      if (!email || typeof email !== "string") {
+        return false;
+      }
+
+      const t = email.trim();
+
+      if (t !== email || t.length > 30) {
+        return false;
+      }
+
+      if (!t.endsWith("@gmail.com")) {
+        return false;
+      }
+
+      const local = t.slice(0, -10);
+
+      if (local.length < 5 || t.includes(" ")) {
+        return false;
+      }
+
+      return /^[a-z0-9._+]+$/.test(local);
+    }
+
+
+    function isValidPassword(password) {
+
+      if (!password || typeof password !== "string") {
+        return false;
+      }
+
+      return (
+        password.length >= 6 &&
+        password.length <= 20 &&
+        !password.includes(" ") &&
+        /^[!-~]+$/.test(password)
+      );
+    }
+
+
+    function isValidName(name) {
+
+      if (!name || typeof name !== "string") {
+        return false;
+      }
+
+      if (name.length > 20) {
+        return false;
+      }
+
+      if (name !== name.trim()) {
+        return false;
+      }
+
+      if (!/^[A-Za-z0-9 ]+$/.test(name)) {
+        return false;
+      }
+
+      if (!/[A-Za-z]/.test(name)) {
+        return false;
+      }
+
+      return true;
+    }
+
+
+    function validateName(showValidationError = false) {
+
+      const name = nameInput.value;
+
+      let message = "";
+
+      if (!name) {
+        message = "Please enter your name.";
+      } else if (name.length > 20) {
+        message = "Name cannot exceed 20 characters.";
+      } else if (name !== name.trim()) {
+        message = "Spaces are not allowed at the beginning or end.";
+      } else if (!/^[A-Za-z0-9 ]+$/.test(name)) {
+        message = "Only English letters, numbers and spaces are allowed.";
+      } else if (!/[A-Za-z]/.test(name)) {
+        message = "At least one English letter is required.";
+      }
+
+      if (showValidationError && message) {
+        nameError.textContent = message;
+        nameError.hidden = false;
+      } else {
+        nameError.hidden = true;
+      }
+
+      return isValidName(name);
+    }
+
+
+    // =====================================================
+    // LOADING MANAGEMENT
+    // =====================================================
+
+    function showAuthLoading() {
+
+      hideError();
+
+      appContainer.classList.remove("visible");
+
+      appContainer.classList.add("slide-out");
+
+      loadingContainer.style.display = "flex";
+
+      loadingContainer.classList.add("auth-loading");
+    }
+
+
+    function hideAuthLoadingAndReturnToLogin() {
+
+      loadingContainer.classList.remove("auth-loading");
+
+      loadingContainer.style.display = "none";
+
+      appContainer.classList.remove("slide-out");
+
+      appContainer.classList.add("visible");
+
+      googleLoginBtn.disabled = false;
+
+      emailEntryBtn.disabled = false;
+
+      emailSwitchBtn.disabled = false;
+
+      googleSwitchBtn.disabled = false;
+
+      nameInput.disabled = false;
+
+      gmailInput.disabled = false;
+
+      passwordInput.disabled = false;
+
+      authActionInProgress = false;
+
+      updateInternetStatus();
+
+      updateLoginButtonState();
+    }
+
+
+    function redirectToHome() {
+
+      if (homeRedirectStarted) {
+        return;
+      }
+
+      homeRedirectStarted = true;
+
+      window.location.replace("home.html");
+    }
+
+
+    // =====================================================
+    // AUTH ACTION LOCK
+    // =====================================================
+
+    function beginAuthAction() {
+
+      if (authActionInProgress || homeRedirectStarted) {
+        return false;
+      }
+
+      authActionInProgress = true;
+
+      loginBtn.disabled = true;
+
+      googleLoginBtn.disabled = true;
+
+      emailEntryBtn.disabled = true;
+
+      emailSwitchBtn.disabled = true;
+
+      googleSwitchBtn.disabled = true;
+
+      nameInput.disabled = true;
+
+      gmailInput.disabled = true;
+
+      passwordInput.disabled = true;
+
+      return true;
+    }
+
+
+    // =====================================================
+    // GOOGLE PROVIDER DETECTION
+    // =====================================================
+
+    function isGoogleUser(user) {
+
+      if (!user || !Array.isArray(user.providerData)) {
+        return false;
+      }
+
+      return user.providerData.some(
+        provider => provider.providerId === "google.com"
+      );
+    }
+
+
+    // =====================================================
+    // GOOGLE PROVIDER
+    // =====================================================
+
+    const googleProvider = new GoogleAuthProvider();
+
+
+    // =====================================================
+    // BACKEND EMAIL REGISTRATION
+    // =====================================================
+
+    async function registerEmailAccount(name, email, password) {
+
+      const response = await fetch(
+        `${BACKEND_URL}/api/register`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            name,
+            email,
+            password
+          })
+        }
+      );
+
+      let result = null;
+
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = null;
+      }
+
+      if (
+        response.ok !== true ||
+        !result ||
+        result.success !== true
+      ) {
+        throw new Error("Account registration failed.");
+      }
+
+      return result;
+    }
+
+
+    // =====================================================
+    // GOOGLE BACKEND REGISTRATION
+    // =====================================================
+
+    async function registerGoogleAccount(user) {
+
+      if (!user || !user.uid) {
+        throw new Error("Google authenticated user is missing.");
+      }
+
+      if (googleRegistrationPromises.has(user.uid)) {
+        return googleRegistrationPromises.get(user.uid);
+      }
+
+      const registrationPromise = (async () => {
+
+        // Get Firebase ID Token.
+
+        const idToken = await user.getIdToken();
+
+        if (
+          typeof idToken !== "string" ||
+          !idToken
+        ) {
+          throw new Error("Unable to obtain Firebase ID Token.");
+        }
+
+        // Backend registration.
+
+        const response = await fetch(
+          GOOGLE_REGISTER_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Authorization": `Bearer ${idToken}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        let result = null;
+
+        try {
+          result = await response.json();
+        } catch (_) {
+          result = null;
+        }
+
+        // Both conditions are mandatory.
+
+        if (
+          response.ok !== true ||
+          !result ||
+          result.success !== true
+        ) {
+          throw new Error(
+            "Google backend registration was unsuccessful."
+          );
+        }
+
+        return true;
+
+      })();
+
+      googleRegistrationPromises.set(
+        user.uid,
+        registrationPromise
+      );
+
+      try {
+
+        return await registrationPromise;
+
+      } catch (error) {
+
+        googleRegistrationPromises.delete(user.uid);
+
+        throw error;
+      }
+    }
+
+
+    // =====================================================
+    // FIRESTORE DATA VALIDATION
+    // =====================================================
+
+    function isPlainDataObject(value) {
+
+      return (
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value)
+      );
+    }
+
+
+    function hasOwn(object, key) {
+
+      return Object.prototype.hasOwnProperty.call(
+        object,
+        key
+      );
+    }
+
+
+    // =====================================================
+    // FIRESTORE DATA FETCHING
+    // =====================================================
+
+    async function fetchCompleteUserData(user) {
+
+      if (!user || !user.uid) {
+        throw new Error("Authenticated Firebase UID is missing.");
+      }
+
+      const uid = user.uid;
+
+      // Prevent duplicate Firestore fetching for the same UID.
+
+      if (userDataPromises.has(uid)) {
+        return userDataPromises.get(uid);
+      }
+
+      const dataPromise = (async () => {
+
+        // -------------------------------------------------
+        // STEP 1: FETCH USER DOCUMENT
+        // users/{uid}
+        // -------------------------------------------------
+
+        const userRef = doc(
+          db,
+          "users",
+          uid
+        );
+
+        const userSnapshot = await getDoc(userRef);
+
+        if (!userSnapshot.exists()) {
+          throw new Error(
+            "User Firestore document does not exist."
+          );
+        }
+
+        const firestoreUserData = userSnapshot.data();
+
+        if (!isPlainDataObject(firestoreUserData)) {
+          throw new Error(
+            "Invalid user Firestore data."
+          );
+        }
+
+
+        // -------------------------------------------------
+        // STEP 2: FETCH POWER DOCUMENT
+        // users/{uid}/power/power4
+        // -------------------------------------------------
+
+        const powerRef = doc(
+          db,
+          "users",
+          uid,
+          "power",
+          "power4"
+        );
+
+        const powerSnapshot = await getDoc(powerRef);
+
+        if (!powerSnapshot.exists()) {
+          throw new Error(
+            "Power Firestore document does not exist."
+          );
+        }
+
+        const powerDocumentData = powerSnapshot.data();
+
+        if (
+          !isPlainDataObject(powerDocumentData) ||
+          !isPlainDataObject(powerDocumentData.power)
+        ) {
+          throw new Error(
+            "Power Map is missing or invalid."
+          );
+        }
+
+        const powerData = powerDocumentData.power;
+
+        // All four required power properties must exist.
+
+        const requiredPowerFields = [
+          "reset",
+          "idea",
+          "replay",
+          "preview"
+        ];
+
+        for (const field of requiredPowerFields) {
+
+          if (!hasOwn(powerData, field)) {
+            throw new Error(
+              `Required power field is missing: ${field}`
+            );
+          }
+        }
+
+
+        // -------------------------------------------------
+        // STEP 3: FETCH PAYMENT METHODS
+        // payment/methodid
+        // -------------------------------------------------
+
+        const paymentMethodsRef = doc(
+          db,
+          "payment",
+          "methodid"
+        );
+
+        const paymentMethodsSnapshot =
+          await getDoc(paymentMethodsRef);
+
+        if (!paymentMethodsSnapshot.exists()) {
+          throw new Error(
+            "Payment methods Firestore document does not exist."
+          );
+        }
+
+        const paymentMethodsData =
+          paymentMethodsSnapshot.data();
+
+        if (
+          !isPlainDataObject(paymentMethodsData) ||
+          Object.keys(paymentMethodsData).length === 0
+        ) {
+          throw new Error(
+            "Payment methods data is missing or invalid."
+          );
+        }
+
+        // Validate each available payment method.
+
+        for (const [methodId, methodData] of
+          Object.entries(paymentMethodsData)) {
+
+          if (
+            !methodId ||
+            !isPlainDataObject(methodData)
+          ) {
+            throw new Error(
+              "Invalid payment method data."
+            );
+          }
+        }
+
+
+        // -------------------------------------------------
+        // STEP 4: COMBINE ALL DATA
+        // -------------------------------------------------
+
+        const userData = {};
+
+        // Preserve only the requested Firestore user fields.
+        // Missing optional fields are not invented.
+
+        const allowedUserFields = [
+          "name",
+          "email",
+          "color",
+          "skin",
+          "coin",
+          "diamond",
+          "profileUrl",
+          "payment"
+        ];
+
+        for (const field of allowedUserFields) {
+
+          if (hasOwn(firestoreUserData, field)) {
+
+            userData[field] =
+              firestoreUserData[field];
+
+          }
+        }
+
+        // Complete Firestore power Map.
+
+        userData.power = powerData;
+
+        // All available payment methods with their IDs
+        // and complete method data.
+
+        userData.paymentMethods = paymentMethodsData;
+
+
+        // -------------------------------------------------
+        // STEP 5: CHECK SERIALIZATION
+        // -------------------------------------------------
+
+        let serializedUserData;
+
+        try {
+
+          serializedUserData = JSON.stringify(userData);
+
+          if (
+            typeof serializedUserData !== "string" ||
+            !serializedUserData
+          ) {
+            throw new Error("Serialization returned invalid data.");
+          }
+
+          // Verify that the serialized data can be parsed.
+
+          const parsedData = JSON.parse(serializedUserData);
+
+          if (
+            !isPlainDataObject(parsedData) ||
+            !isPlainDataObject(parsedData.power) ||
+            !isPlainDataObject(parsedData.paymentMethods)
+          ) {
+            throw new Error("Serialized user data is invalid.");
+          }
+
+        } catch (error) {
+
+          throw new Error(
+            "Unable to prepare complete user data for Local Storage."
+          );
+        }
+
+
+        // -------------------------------------------------
+        // STEP 6: SAVE USING EXACTLY ONE KEY
+        // -------------------------------------------------
+
+        try {
+
+          localStorage.setItem(
+            LOCAL_STORAGE_KEY,
+            serializedUserData
+          );
+
+          // Verify successful saving.
+
+          const savedData = localStorage.getItem(
+            LOCAL_STORAGE_KEY
+          );
+
+          if (
+            savedData !== serializedUserData
+          ) {
+            throw new Error(
+              "Local Storage verification failed."
+            );
+          }
+
+          // Verify the saved structure.
+
+          const verifiedData = JSON.parse(savedData);
+
+          if (
+            !isPlainDataObject(verifiedData) ||
+            !isPlainDataObject(verifiedData.power) ||
+            !isPlainDataObject(verifiedData.paymentMethods)
+          ) {
+            throw new Error(
+              "Saved user data verification failed."
+            );
+          }
+
+          console.log(
+            "Complete Firestore user data saved successfully."
+          );
+
+          return verifiedData;
+
+        } catch (error) {
+
+          console.error(
+            "Local Storage saving error:",
+            error
+          );
+
+          throw new Error(
+            "Unable to save complete user data."
+          );
+        }
+
+      })();
+
+      userDataPromises.set(uid, dataPromise);
+
+      try {
+
+        return await dataPromise;
+
+      } catch (error) {
+
+        // Allow retry after failure.
+
+        userDataPromises.delete(uid);
+
+        throw error;
+      }
+    }
+
+
+    // =====================================================
+    // AUTHENTICATED USER PROCESSING
+    // =====================================================
+
+    async function processAuthenticatedUser(user) {
+
+      if (!user || !user.uid) {
+        throw new Error("Authenticated user is unavailable.");
+      }
+
+      // Reuse the same processing operation if called again.
+
+      if (activeAuthenticationPromise) {
+        return activeAuthenticationPromise;
+      }
+
+      activeAuthenticationPromise = (async () => {
+
+        try {
+
+          // -----------------------------------------------
+          // STEP 1: VERIFY GOOGLE BACKEND IF GOOGLE USER
+          // -----------------------------------------------
+
+          if (isGoogleUser(user)) {
+
+            await registerGoogleAccount(user);
+
+            verifiedGoogleUid = user.uid;
+
+            console.log(
+              "Google backend verification successful."
+            );
+
+          }
+
+          // -----------------------------------------------
+          // STEP 2: FETCH FIRESTORE DATA
+          // -----------------------------------------------
+
+          const userData =
+            await fetchCompleteUserData(user);
+
+          if (!userData) {
+            throw new Error(
+              "Complete user data is unavailable."
+            );
+          }
+
+          // -----------------------------------------------
+          // STEP 3: VERIFY GOOGLE UID AGAIN
+          // -----------------------------------------------
+
+          if (
+            isGoogleUser(user) &&
+            verifiedGoogleUid !== user.uid
+          ) {
+            throw new Error(
+              "Google backend verification failed."
+            );
+          }
+
+          // -----------------------------------------------
+          // STEP 4: REDIRECT ONLY AFTER EVERYTHING SUCCEEDS
+          // -----------------------------------------------
+
+          redirectToHome();
+
+          return userData;
+
+        } catch (error) {
+
+          console.error(
+            "Authenticated user processing failed:",
+            error
+          );
+
+          // A failed operation must never allow navigation.
+
+          verifiedGoogleUid = null;
+
+          // Sign out to prevent an unsuccessful session
+          // from being treated as an authenticated session.
+
+          try {
+
+            if (auth.currentUser) {
+              await signOut(auth);
+            }
+
+          } catch (signOutError) {
+
+            console.error(
+              "Sign-out after processing failure:",
+              signOutError
+            );
+          }
+
+          throw error;
+
+        }
+
+      })();
+
+      try {
+
+        return await activeAuthenticationPromise;
+
+      } finally {
+
+        activeAuthenticationPromise = null;
+      }
+    }
+
+
+    // =====================================================
+    // ERROR MESSAGE HANDLING
+    // =====================================================
+
+    function getFriendlyErrorMessage(error) {
+
+      const code = error?.code || "";
+
+      if (!navigator.onLine) {
+        return "No internet connection. Please try again.";
+      }
+
+      if (code === "auth/invalid-credential") {
+        return "Invalid email or password.";
+      }
+
+      if (code === "auth/user-not-found") {
+        return "No account found with this email.";
+      }
+
+      if (code === "auth/wrong-password") {
+        return "Incorrect password.";
+      }
+
+      if (code === "auth/email-already-in-use") {
+        return "This email is already registered.";
+      }
+
+      if (code === "auth/weak-password") {
+        return "Your password is too weak.";
+      }
+
+      if (code === "auth/invalid-email") {
+        return "Please enter a valid email address.";
+      }
+
+      if (code === "auth/network-request-failed") {
+        return "Network error. Please check your connection.";
+      }
+
+      if (error?.message?.includes("Firestore")) {
+        return "Unable to retrieve your account data. Please try again.";
+      }
+
+      if (
+        error?.message?.includes("Power") ||
+        error?.message?.includes("power")
+      ) {
+        return "Unable to retrieve your account power data.";
+      }
+
+      if (
+        error?.message?.includes("Payment") ||
+        error?.message?.includes("payment")
+      ) {
+        return "Unable to retrieve payment methods.";
+      }
+
+      if (
+        error?.message?.includes("Local Storage") ||
+        error?.message?.includes("Local storage")
+      ) {
+        return "Unable to save your account information.";
+      }
+
+      if (
+        error?.message?.includes("registration") ||
+        error?.message?.includes("Backend")
+      ) {
+        return "Account verification failed. Please try again.";
+      }
+
+      return "Something went wrong. Please try again.";
+    }
+
+
+    // =====================================================
+    // LOGIN SCREEN
+    // =====================================================
+
+    function showLoginScreen() {
+
+      loadingContainer.classList.remove("auth-loading");
+
+      loadingContainer.style.display = "none";
+
+      appContainer.classList.remove("slide-out");
+
+      appContainer.classList.add("visible");
+
+      googleLoginBtn.disabled = false;
+
+      emailEntryBtn.disabled = false;
+
+      emailSwitchBtn.disabled = false;
+
+      googleSwitchBtn.disabled = false;
+
+      nameInput.disabled = false;
+
+      gmailInput.disabled = false;
+
+      passwordInput.disabled = false;
+
+      authActionInProgress = false;
+
+      showInitialMode();
+
+      updateToggle(false);
+
+      updateInternetStatus();
+
+      document.documentElement.style.background = "#0F1E30";
+
+      document.body.style.background = "#0F1E30";
+
+      updateLoginButtonState();
+    }
+
+
+    // =====================================================
+    // FAILED AUTHENTICATION HANDLING
+    // =====================================================
+
+    async function handleAuthenticationFailure(error) {
+
+      console.error(
+        "Authentication process failed:",
+        error
+      );
+
+      verifiedGoogleUid = null;
+
+      // Do not redirect after any failed operation.
+
+      try {
+
+        if (auth.currentUser) {
+          await signOut(auth);
+        }
+
+      } catch (signOutError) {
+
+        console.error(
+          "Authentication cleanup failed:",
+          signOutError
+        );
+      }
+
+      hideAuthLoadingAndReturnToLogin();
+
+      showLoginScreen();
+
+      showError(
+        getFriendlyErrorMessage(error)
+      );
+    }
+
+
+    // =====================================================
+    // GOOGLE AUTHENTICATION COMPLETION
+    // =====================================================
+
+    async function completeGoogleAuthentication(user) {
+
+      if (!user || !user.uid) {
+        throw new Error("Google user is unavailable.");
+      }
+
+      if (!isGoogleUser(user)) {
+        throw new Error(
+          "Authenticated account is not a Google account."
+        );
+      }
+
+      if (!authActionInProgress) {
+
+        if (!beginAuthAction()) {
+          return;
+        }
+      }
+
+      showAuthLoading();
+
+      try {
+
+        await processAuthenticatedUser(user);
+
+      } catch (error) {
+
+        await handleAuthenticationFailure(error);
+      }
+    }
+
+
+    // =====================================================
+    // GOOGLE REDIRECT AUTHENTICATION
+    // =====================================================
+
+    async function handleGoogleAuthentication() {
+
+      if (
+        authActionInProgress ||
+        !navigator.onLine ||
+        homeRedirectStarted
+      ) {
+        return;
+      }
+
+      hideError();
+
+      if (!beginAuthAction()) {
+        return;
+      }
+
+      showAuthLoading();
+
+      try {
+
+        googleRedirectStarted = true;
+
+        await signInWithRedirect(
+          auth,
+          googleProvider
+        );
+
+        // Browser redirect is handled by Firebase.
+
+      } catch (error) {
+
+        console.error(
+          "Google redirect start error:",
+          error
+        );
+
+        googleRedirectStarted = false;
+
+        await handleAuthenticationFailure(error);
+      }
+    }
+
+
+    // =====================================================
+    // REDIRECT RESULT PROCESSING
+    // =====================================================
+
+    async function processRedirectResult() {
+
+      let result = null;
+
+      let redirectError = null;
+
+      try {
+
+        result = await getRedirectResult(auth);
+
+      } catch (error) {
+
+        redirectError = error;
+
+        console.error(
+          "Google redirect result error:",
+          error
+        );
+      }
+
+      // Redirect result processing is now complete.
+
+      redirectHandled = true;
+
+      if (redirectError) {
+
+        await handleAuthenticationFailure(redirectError);
+
+        return;
+      }
+
+      // Prefer the redirect result user.
+
+      const user =
+        result?.user || auth.currentUser;
+
+      if (!user) {
+
+        showLoginScreen();
+
+        return;
+      }
+
+      // All authenticated users must complete Firestore fetching.
+
+      if (!authActionInProgress) {
+        beginAuthAction();
+      }
+
+      showAuthLoading();
+
+      try {
+
+        await processAuthenticatedUser(user);
+
+      } catch (error) {
+
+        await handleAuthenticationFailure(error);
+      }
+    }
+
+
+    // =====================================================
+    // EMAIL LOGIN / SIGN UP
+    // =====================================================
+
+    async function handleEmailAuthentication(mode) {
+
+      if (
+        authActionInProgress ||
+        !navigator.onLine ||
+        homeRedirectStarted
+      ) {
+        return;
+      }
+
+      hideError();
+
+      const email = gmailInput.value
+        .trim()
+        .toLowerCase();
+
+      const password = passwordInput.value;
+
+      const name = nameInput.value;
+
+      if (!isValidGmail(email)) {
+        showError("Please enter a valid Gmail address.");
+        return;
+      }
+
+      if (!isValidPassword(password)) {
+        showError("Please enter a valid password.");
+        return;
+      }
+
+      if (mode === "signup" && !isValidName(name)) {
+
+        validateName(true);
+
+        return;
+      }
+
+      if (!beginAuthAction()) {
+        return;
+      }
+
+      showAuthLoading();
+
+      try {
+
+        // -----------------------------------------------
+        // EMAIL SIGN UP
+        // -----------------------------------------------
+
+        if (mode === "signup") {
+
+          // STEP 1: Backend registration.
+
+          await registerEmailAccount(
+            name,
+            email,
+            password
+          );
+
+          // STEP 2: Firebase Email Authentication.
+
+          const credential =
+            await signInWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+
+          if (
+            !credential ||
+            !credential.user
+          ) {
+            throw new Error(
+              "Firebase sign-in after registration failed."
+            );
+          }
+
+          // STEP 3: Fetch Firestore data.
+          // STEP 4: Save complete user data.
+          // STEP 5: Redirect after successful saving.
+
+          await processAuthenticatedUser(
+            credential.user
+          );
+
+          return;
+        }
+
+
+        // -----------------------------------------------
+        // EMAIL LOGIN
+        // -----------------------------------------------
+
+        // STEP 1: Firebase Email Authentication.
+
+        const credential =
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+
+        if (
+          !credential ||
+          !credential.user
+        ) {
+          throw new Error("Email sign-in failed.");
+        }
+
+        // STEP 2: Fetch Firestore data.
+        // STEP 3: Save complete user data.
+        // STEP 4: Redirect after successful saving.
+
+        await processAuthenticatedUser(
+          credential.user
+        );
+
+        return;
+
+      } catch (error) {
+
+        await handleAuthenticationFailure(error);
+      }
+    }
+
+
+    // =====================================================
+    // INPUT EVENTS
+    // =====================================================
+
+    function updateLoginButtonState() {
+
+      if (authActionInProgress) {
+
+        loginBtn.disabled = true;
+
+        return;
+      }
+
+      const emailValid =
+        isValidGmail(
+          gmailInput.value.trim().toLowerCase()
+        );
+
+      const passwordValid =
+        isValidPassword(passwordInput.value);
+
+      const nameValid = emailSignupMode
+        ? isValidName(nameInput.value)
+        : true;
+
+      loginBtn.disabled = !(
+        emailValid &&
+        passwordValid &&
+        nameValid
+      );
+    }
+
+
+    gmailInput.addEventListener(
+      "input",
+      () => {
+        hideError();
+        updateLoginButtonState();
+      }
+    );
+
+
+    passwordInput.addEventListener(
+      "input",
+      () => {
+        hideError();
+        updateLoginButtonState();
+      }
+    );
+
+
+    nameInput.addEventListener("input", () => {
+
+      if (!emailSignupMode) return;
+
+      hideError();
+
+      validateName(false);
+
+      updateLoginButtonState();
+    });
+
+
+    nameInput.addEventListener("blur", () => {
+
+      if (
+        emailSignupMode &&
+        nameInput.value.length > 0
+      ) {
+        validateName(true);
+      }
+    });
+
+
+    // =====================================================
+    // MAIN BUTTON EVENTS
+    // =====================================================
+
+    emailEntryBtn.addEventListener("click", () => {
+
+      showEmailMode();
+    });
+
+
+    loginBtn.addEventListener("click", () => {
+
+      if (
+        authActionInProgress ||
+        loginBtn.disabled ||
+        !emailMode
+      ) {
+        return;
+      }
+
+      const mode = emailSignupMode
+        ? "signup"
+        : "login";
+
+      handleEmailAuthentication(mode);
+    });
+
+
+    // =====================================================
+    // GOOGLE BUTTON EVENTS
+    // =====================================================
+
+    googleLoginBtn.addEventListener("click", () => {
+
+      handleGoogleAuthentication();
+    });
+
+
+    googleSwitchBtn.addEventListener("click", () => {
+
+      handleGoogleAuthentication();
+    });
+
+
+    // =====================================================
+    // BACK-FORWARD CACHE
+    // =====================================================
+
+    window.addEventListener("pageshow", (event) => {
+
+      if (
+        event.persisted &&
+        googleRedirectStarted
+      ) {
+
+        googleRedirectStarted = false;
+
+        // Redirect result processing remains responsible
+        // for authentication and backend verification.
+
+        if (
+          redirectHandled &&
+          !authActionInProgress
+        ) {
+          showLoginScreen();
+        }
+      }
+    });
+
+
+    // =====================================================
+    // AUTH STATE LISTENER
+    // =====================================================
+
+    onAuthStateChanged(auth, async (user) => {
+
+      // Do not route until getRedirectResult finishes.
+
+      if (!redirectHandled) {
+
+        console.log(
+          "Redirect result pending - auth state deferred."
+        );
+
+        return;
+      }
+
+      // Ignore authentication-state events during
+      // an active authentication/data-fetching process.
+
+      if (
+        authActionInProgress ||
+        homeRedirectStarted ||
+        activeAuthenticationPromise
+      ) {
+        return;
+      }
+
+      // No authenticated user.
+
+      if (!user) {
+
+        showLoginScreen();
+
+        return;
+      }
+
+      // An authenticated user must pass the same
+      // backend verification and Firestore process.
+
+      if (!beginAuthAction()) {
+        return;
+      }
+
+      showAuthLoading();
+
+      try {
+
+        await processAuthenticatedUser(user);
+
+      } catch (error) {
+
+        await handleAuthenticationFailure(error);
+      }
+    });
+
+
+    // =====================================================
+    // INITIAL STATE
+    // =====================================================
+
+    loginBtn.disabled = true;
+
+    googleLoginBtn.disabled = false;
+
+    updateToggle(false);
+
+    updateInternetStatus();
+
+    document.documentElement.style.background = "#0F1E30";
+
+    document.body.style.background = "#0F1E30";
+
+
+    // =====================================================
+    // INITIAL REDIRECT RESULT PROCESSING
+    // =====================================================
+
+    processRedirectResult().catch(async (error) => {
+
+      console.error(
+        "Initial redirect processing failure:",
+        error
+      );
+
+      redirectHandled = true;
+
+      await handleAuthenticationFailure(error);
+    });
+
+
+    // =====================================================
+    // DEBUG INFORMATION
+    // =====================================================
+
+    console.log("TileUp Login ready.");
+
+    console.log("Backend URL:", BACKEND_URL);
+
+    console.log("Email registration: /api/register");
+
+    console.log("Google registration: /api/google/register");
+
+    console.log("Firestore user document: users/{uid}");
+
+    console.log("Firestore power document: users/{uid}/power/power4");
+
+    console.log("Firestore payment methods: payment/methodid");
+
+    console.log("Local Storage key:", LOCAL_STORAGE_KEY);
+
+    console.log("All account data uses one Local Storage key.");
+
+    console.log("Navigation requires successful data fetching and saving.");
+
+  </script>
+
+</body>
+</html>

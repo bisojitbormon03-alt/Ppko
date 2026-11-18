@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <meta name="theme-color" content="#16293F" />
+  <meta name="color-scheme" content="dark" />
+
+  <title>TileUp – History</title>
+
+  <style>
+    :root {
+      --theme: #213C5E;
+      --theme-deep: #16293F;
+      --theme-deeper: #0F1E30;
+      --theme-soft: #2C4E76;
+      --theme-softer: #35597F;
+
+      --background: var(--theme-deeper);
+      --surface: var(--theme-deep);
+      --surface-light: var(--theme);
+      --surface-hover: var(--theme-soft);
+
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+
+      --border: rgba(255, 255, 255, 0.09);
+      --border-light: rgba(255, 255, 255, 0.14);
+
+      --success: #22C55E;
+      --success-bg: rgba(34, 197, 94, 0.13);
+
+      --warning: #FACC15;
+      --warning-bg: rgba(250, 204, 21, 0.13);
+
+      --danger: #EF4444;
+      --danger-bg: rgba(239, 68, 68, 0.13);
+
+      --shadow: 0 8px 25px rgba(0, 0, 0, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+
+      background: var(--background);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: var(--text-primary);
+
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    /* ============================================================
+       APP CONTAINER
+       ============================================================ */
+
+    .app-container {
+      width: 100%;
+      max-width: 400px;
+
+      height: 100vh;
+      height: 100dvh;
+
+      max-height: 900px;
+      min-height: 0;
+
+      background: var(--background);
+
+      display: flex;
+      flex-direction: column;
+
+      position: relative;
+
+      overflow: hidden;
+
+      flex-shrink: 0;
+
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    @media (min-width: 421px) {
+      .app-container {
+        border-radius: 24px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .app-container {
+        width: 100%;
+
+        height: 100vh;
+        height: 100dvh;
+
+        max-height: 100vh;
+        max-height: 100dvh;
+
+        border-radius: 0;
+        border: none;
+
+        box-shadow: none;
+      }
+    }
+
+    /* ============================================================
+       FIXED HEADER
+       Header stays outside the scrolling content area.
+       ============================================================ */
+
+    .header {
+      width: 100%;
+
+      height: 60px;
+      min-height: 60px;
+
+      flex: 0 0 60px;
+
+      background: var(--surface);
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 16px;
+
+      border-bottom: 1px solid var(--border);
+
+      position: relative;
+      z-index: 10;
+
+      overflow: hidden;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+
+      background: transparent;
+      border: none;
+
+      cursor: pointer;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      margin-right: 8px;
+
+      -webkit-tap-highlight-color: transparent;
+      tap-highlight-color: transparent;
+
+      outline: none;
+      box-shadow: none;
+
+      transition: background 0.2s ease;
+
+      user-select: none;
+      -webkit-user-select: none;
+
+      flex-shrink: 0;
+    }
+
+    .back-btn svg {
+      width: 21px;
+      height: 21px;
+
+      stroke: var(--text-primary);
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .back-btn:hover,
+    .back-btn:active,
+    .back-btn:focus,
+    .back-btn:focus-visible {
+      background: transparent;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+
+      color: var(--text-primary);
+
+      flex: 1;
+      min-width: 0;
+
+      text-align: center;
+
+      margin-right: 48px;
+    }
+
+    /* ============================================================
+       HISTORY SCROLL AREA
+       Main Android and mobile scrolling fix.
+       ============================================================ */
+
+    .scroll-area {
+      width: 100%;
+
+      flex: 1 1 0%;
+
+      height: 0;
+      min-height: 0;
+      min-width: 0;
+
+      max-height: 100%;
+
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      padding: 16px;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 14px;
+
+      position: relative;
+
+      /* Android and iOS touch scrolling */
+      -webkit-overflow-scrolling: touch;
+      -webkit-overscroll-behavior-y: contain;
+      overscroll-behavior-y: contain;
+
+      /* Allow vertical touch gestures only */
+      touch-action: pan-y;
+
+      /* Prevent horizontal page movement */
+      overscroll-behavior-x: none;
+
+      scrollbar-width: thin;
+      scrollbar-color: var(--theme-soft) transparent;
+
+      scroll-behavior: auto;
+
+      /* Allow content to determine the scroll height */
+      contain: layout style;
+    }
+
+    .scroll-area::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: var(--theme-soft);
+      border-radius: 4px;
+    }
+
+    .scroll-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* ============================================================
+       HISTORY CARD
+       Prevent flex shrinking when many records exist.
+       ============================================================ */
+
+    .card {
+      width: 100%;
+
+      flex: 0 0 auto;
+      flex-shrink: 0;
+
+      background: var(--surface);
+
+      border-radius: 16px;
+
+      padding: 16px;
+
+      border: 1px solid var(--border);
+
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.14);
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 12px;
+
+      overflow: hidden;
+
+      animation: cardAppear 0.25s ease both;
+    }
+
+    @keyframes cardAppear {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .provider-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .provider-icon {
+      width: 32px;
+      height: 32px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      overflow: hidden;
+
+      background: var(--theme);
+      color: #FFFFFF;
+
+      font-size: 15px;
+      font-weight: 800;
+
+      text-transform: uppercase;
+
+      position: relative;
+    }
+
+    .provider-icon img {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      border-radius: 50%;
+    }
+
+    .provider-name {
+      font-size: 15px;
+      font-weight: 700;
+
+      color: var(--text-primary);
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 6px;
+
+      padding: 5px 10px;
+
+      border-radius: 12px;
+
+      font-size: 11px;
+      font-weight: 700;
+
+      white-space: nowrap;
+
+      flex-shrink: 0;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+
+      border-radius: 50%;
+
+      flex-shrink: 0;
+    }
+
+    .badge-completed {
+      background: var(--success-bg);
+      color: #4ADE80;
+    }
+
+    .badge-completed .badge-dot {
+      background: var(--success);
+    }
+
+    .badge-pending {
+      background: var(--warning-bg);
+      color: #FDE047;
+    }
+
+    .badge-pending .badge-dot {
+      background: var(--warning);
+    }
+
+    .badge-rejected {
+      background: var(--danger-bg);
+      color: #FCA5A5;
+    }
+
+    .badge-rejected .badge-dot {
+      background: var(--danger);
+    }
+
+    .detail-label {
+      font-size: 12px;
+      font-weight: 500;
+
+      color: var(--text-secondary);
+
+      line-height: 1.5;
+
+      overflow-wrap: anywhere;
+    }
+
+    .coins-value {
+      font-size: 13px;
+      font-weight: 700;
+
+      color: var(--text-primary);
+    }
+
+    .rate-and-date {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+
+      gap: 10px;
+
+      padding-top: 10px;
+
+      border-top: 1px solid var(--border);
+    }
+
+    .rate-info {
+      display: flex;
+      flex-direction: column;
+
+      gap: 5px;
+
+      min-width: 0;
+    }
+
+    .exchange-rate {
+      font-size: 11px;
+
+      color: var(--text-muted);
+
+      font-weight: 500;
+
+      overflow-wrap: anywhere;
+    }
+
+    .converted-amount {
+      font-size: 14px;
+      font-weight: 700;
+
+      color: var(--text-primary);
+
+      overflow-wrap: anywhere;
+    }
+
+    .date-info {
+      text-align: right;
+
+      font-size: 11px;
+      font-weight: 600;
+
+      color: var(--text-secondary);
+
+      line-height: 1.5;
+
+      white-space: nowrap;
+
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+
+    .empty-state {
+      width: 100%;
+
+      flex: 0 0 auto;
+
+      text-align: center;
+
+      font-size: 14px;
+      font-weight: 500;
+
+      color: var(--text-muted);
+
+      line-height: 1.6;
+
+      padding: 12px 0;
+    }
+
+    /* ============================================================
+       ERROR STATE
+       ============================================================ */
+
+    .error-state {
+      width: 100%;
+
+      flex: 0 0 auto;
+
+      text-align: center;
+
+      font-size: 14px;
+
+      padding: 32px 16px;
+
+      background: var(--surface);
+
+      border-radius: 16px;
+
+      border: 1px solid var(--border);
+
+      color: #FCA5A5;
+
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       SMALL SCREEN RESPONSIVENESS
+       ============================================================ */
+
+    @media (max-width: 350px) {
+      .scroll-area {
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .card {
+        padding: 13px;
+      }
+
+      .provider-name {
+        font-size: 14px;
+      }
+
+      .converted-amount {
+        font-size: 13px;
+      }
+
+      .date-info {
+        font-size: 10px;
+      }
+
+      .exchange-rate {
+        font-size: 10px;
+      }
+    }
+
+    /* ============================================================
+       REDUCED MOTION
+       ============================================================ */
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- FIXED HEADER -->
+
+    <header class="header">
+
+      <button
+        class="back-btn"
+        id="backBtn"
+        type="button"
+        aria-label="Go Back"
+      >
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M19 12H5M12 19l-7-7 7-7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <h1 class="header-title">History</h1>
+
+    </header>
+
+    <!-- VERTICALLY SCROLLABLE HISTORY CONTENT -->
+
+    <main
+      class="scroll-area"
+      id="history-list"
+      aria-live="polite"
+    ></main>
+
+  </div>
+
+  <script>
+    'use strict';
+
+    // ============================================================
+    // 1. CONFIGURATION
+    // ============================================================
+
+    const STORAGE_KEY = 'userDatakv9688658vs';
+    const LOGO_DIRECTORY = 'cripto_currency/';
+
+    // ============================================================
+    // 2. DOM ELEMENTS
+    // ============================================================
+
+    const container = document.getElementById('history-list');
+    const backBtn = document.getElementById('backBtn');
+
+    // ============================================================
+    // 3. BACK BUTTON
+    // ============================================================
+
+    backBtn.addEventListener('click', function () {
+      window.location.href = 'profile.html';
+    });
+
+    // ============================================================
+    // 4. SAFE OBJECT VALIDATION
+    // ============================================================
+
+    function isPlainObject(value) {
+      if (
+        value === null ||
+        typeof value !== 'object' ||
+        Array.isArray(value)
+      ) {
+        return false;
+      }
+
+      const prototype = Object.getPrototypeOf(value);
+
+      return (
+        prototype === Object.prototype ||
+        prototype === null
+      );
+    }
+
+    // ============================================================
+    // 5. READ USER DATA FROM LOCALSTORAGE
+    // ============================================================
+
+    function readUserData() {
+      let storedData;
+
+      try {
+        storedData = localStorage.getItem(STORAGE_KEY);
+      } catch (error) {
+        console.error('Unable to access LocalStorage:', error);
+
+        return {
+          success: false,
+          data: null,
+          message: 'Unable to access your saved history data.'
+        };
+      }
+
+      if (
+        typeof storedData !== 'string' ||
+        !storedData.trim()
+      ) {
+        return {
+          success: true,
+          data: null,
+          message: 'No withdrawal history available.'
+        };
+      }
+
+      let userData;
+
+      try {
+        userData = JSON.parse(storedData);
+      } catch (error) {
+        console.error('Invalid LocalStorage JSON:', error);
+
+        return {
+          success: false,
+          data: null,
+          message: 'Your saved history data is invalid.'
+        };
+      }
+
+      if (!isPlainObject(userData)) {
+        console.warn('Stored user data is not a valid object.');
+
+        return {
+          success: false,
+          data: null,
+          message: 'Your saved history data is invalid.'
+        };
+      }
+
+      return {
+        success: true,
+        data: userData,
+        message: ''
+      };
+    }
+
+    // ============================================================
+    // 6. VALIDATE PAYMENT METHOD LOGO FILENAME
+    // ============================================================
+
+    function getLogoFileName(value) {
+      if (typeof value !== 'string') {
+        return '';
+      }
+
+      const fileName = value.trim();
+
+      if (!fileName) {
+        return '';
+      }
+
+      // Only a simple image filename is accepted.
+      // URLs, directory paths and unsafe filenames are rejected.
+
+      const validFileName =
+        /^[A-Za-z0-9_-][A-Za-z0-9_-]*\.(?:png|jpe?g|webp|gif|svg)$/i;
+
+      if (!validFileName.test(fileName)) {
+        return '';
+      }
+
+      return fileName;
+    }
+
+    // ============================================================
+    // 7. SAFE PAYMENT METHOD CONFIGURATION
+    // ============================================================
+
+    function getPaymentMethodInfo(paymentMethods, methodId) {
+      const fallback = {
+        name: methodId || 'Unknown',
+        currency: 'USD',
+        logoUrl: '',
+        exchangeRate: null,
+        type: null
+      };
+
+      if (
+        !isPlainObject(paymentMethods) ||
+        typeof methodId !== 'string' ||
+        !methodId.trim()
+      ) {
+        return fallback;
+      }
+
+      const methodData = paymentMethods[methodId];
+
+      if (!isPlainObject(methodData)) {
+        return fallback;
+      }
+
+      const name =
+        typeof methodData.name === 'string' &&
+        methodData.name.trim()
+          ? methodData.name.trim()
+          : fallback.name;
+
+      const currency =
+        typeof methodData.currency === 'string' &&
+        methodData.currency.trim()
+          ? methodData.currency.trim()
+          : fallback.currency;
+
+      const exchangeRate =
+        typeof methodData.exchangeRate === 'number' &&
+        Number.isFinite(methodData.exchangeRate)
+          ? methodData.exchangeRate
+          : null;
+
+      return {
+        name: name,
+        currency: currency,
+        logoUrl: getLogoFileName(methodData.logoUrl),
+        exchangeRate: exchangeRate,
+        type: methodData.type ?? null
+      };
+    }
+
+    // ============================================================
+    // 8. NORMALIZE TIMESTAMP
+    // Supports:
+    // - Milliseconds
+    // - Unix seconds
+    // - ISO date strings
+    // - Date objects
+    // - Firestore-like timestamp objects if present in memory
+    // ============================================================
+
+    function getTimestampMillis(timestamp) {
+      if (
+        timestamp === null ||
+        timestamp === undefined ||
+        timestamp === ''
+      ) {
+        return null;
+      }
+
+      try {
+        if (timestamp instanceof Date) {
+          const milliseconds = timestamp.getTime();
+
+          return Number.isFinite(milliseconds)
+            ? milliseconds
+            : null;
+        }
+
+        if (typeof timestamp === 'number') {
+          if (!Number.isFinite(timestamp)) {
+            return null;
+          }
+
+          // Unix timestamps in seconds are converted to milliseconds.
+          const milliseconds =
+            Math.abs(timestamp) < 100000000000
+              ? timestamp * 1000
+              : timestamp;
+
+          return Number.isFinite(milliseconds)
+            ? milliseconds
+            : null;
+        }
+
+        if (typeof timestamp === 'string') {
+          const trimmed = timestamp.trim();
+
+          if (!trimmed) {
+            return null;
+          }
+
+          // Numeric strings are treated as seconds or milliseconds.
+          if (/^-?\d+(?:\.\d+)?$/.test(trimmed)) {
+            const numericTimestamp = Number(trimmed);
+
+            if (!Number.isFinite(numericTimestamp)) {
+              return null;
+            }
+
+            const milliseconds =
+              Math.abs(numericTimestamp) < 100000000000
+                ? numericTimestamp * 1000
+                : numericTimestamp;
+
+            return Number.isFinite(milliseconds)
+              ? milliseconds
+              : null;
+          }
+
+          const parsed = Date.parse(trimmed);
+
+          return Number.isFinite(parsed)
+            ? parsed
+            : null;
+        }
+
+        // Support timestamp-like objects when supplied in memory.
+        if (
+          typeof timestamp === 'object' &&
+          typeof timestamp.toMillis === 'function'
+        ) {
+          const milliseconds = timestamp.toMillis();
+
+          return (
+            typeof milliseconds === 'number' &&
+            Number.isFinite(milliseconds)
+          )
+            ? milliseconds
+            : null;
+        }
+
+        if (
+          typeof timestamp === 'object' &&
+          typeof timestamp.toDate === 'function'
+        ) {
+          const date = timestamp.toDate();
+
+          if (date instanceof Date) {
+            const milliseconds = date.getTime();
+
+            return Number.isFinite(milliseconds)
+              ? milliseconds
+              : null;
+          }
+        }
+
+        // Support plain timestamp objects with seconds/nanoseconds.
+        if (
+          isPlainObject(timestamp) &&
+          typeof timestamp.seconds === 'number' &&
+          Number.isFinite(timestamp.seconds)
+        ) {
+          const milliseconds =
+            timestamp.seconds * 1000 +
+            (
+              typeof timestamp.nanoseconds === 'number' &&
+              Number.isFinite(timestamp.nanoseconds)
+                ? timestamp.nanoseconds / 1000000
+                : 0
+            );
+
+          return Number.isFinite(milliseconds)
+            ? milliseconds
+            : null;
+        }
+
+        return null;
+
+      } catch (error) {
+        console.warn('Unable to parse withdrawal timestamp:', error);
+        return null;
+      }
+    }
+
+    // ============================================================
+    // 9. FORMAT DATE AND TIME
+    // ============================================================
+
+    function formatDate(timestamp) {
+      const milliseconds = getTimestampMillis(timestamp);
+
+      if (milliseconds === null) {
+        return {
+          date: '—',
+          time: '—'
+        };
+      }
+
+      try {
+        const dateObject = new Date(milliseconds);
+
+        if (!Number.isFinite(dateObject.getTime())) {
+          return {
+            date: '—',
+            time: '—'
+          };
+        }
+
+        const day =
+          String(dateObject.getDate()).padStart(2, '0');
+
+        const month =
+          String(dateObject.getMonth() + 1);
+
+        const year =
+          dateObject.getFullYear();
+
+        const minutes =
+          String(dateObject.getMinutes()).padStart(2, '0');
+
+        const hours =
+          dateObject.getHours();
+
+        const ampm =
+          hours >= 12 ? 'PM' : 'AM';
+
+        const hour12 =
+          hours % 12 || 12;
+
+        const hour =
+          String(hour12).padStart(2, '0');
+
+        return {
+          date: `${day} ${month} ${year}`,
+          time: `${hour}:${minutes} ${ampm}`
+        };
+
+      } catch (error) {
+        console.warn('Date formatting failed:', error);
+
+        return {
+          date: '—',
+          time: '—'
+        };
+      }
+    }
+
+    // ============================================================
+    // 10. SAFE NUMBER HANDLING AND FORMATTING
+    // ============================================================
+
+    function getValidNumber(value) {
+      if (
+        typeof value !== 'number' ||
+        !Number.isFinite(value)
+      ) {
+        return null;
+      }
+
+      return value;
+    }
+
+    function formatNumber(value, maximumFractionDigits = 8) {
+      const number = getValidNumber(value);
+
+      if (number === null) {
+        return '—';
+      }
+
+      try {
+        return new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: maximumFractionDigits
+        }).format(number);
+      } catch (error) {
+        console.warn('Number formatting failed:', error);
+        return String(number);
+      }
+    }
+
+    // ============================================================
+    // 11. EMPTY STATE
+    // ============================================================
+
+    function showEmptyState(message) {
+      container.replaceChildren();
+
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      emptyState.textContent =
+        message || 'No withdrawal history available.';
+
+      container.appendChild(emptyState);
+    }
+
+    // ============================================================
+    // 12. ERROR STATE
+    // ============================================================
+
+    function showErrorState(message) {
+      container.replaceChildren();
+
+      const errorState = document.createElement('div');
+      errorState.className = 'error-state';
+      errorState.textContent =
+        message || 'Unable to load withdrawal history. Please try again.';
+
+      container.appendChild(errorState);
+    }
+
+    // ============================================================
+    // 13. CREATE PROVIDER ICON
+    // ============================================================
+
+    function createProviderIcon(methodInfo, methodName) {
+      const iconContainer = document.createElement('div');
+      iconContainer.className = 'provider-icon';
+
+      const safeName =
+        typeof methodName === 'string'
+          ? methodName.trim()
+          : '';
+
+      const fallbackLetter =
+        safeName
+          ? safeName.charAt(0).toUpperCase()
+          : '?';
+
+      // The fallback letter is always available underneath the image.
+      iconContainer.textContent = fallbackLetter;
+
+      const fileName =
+        getLogoFileName(methodInfo?.logoUrl);
+
+      if (!fileName) {
+        return iconContainer;
+      }
+
+      const image = document.createElement('img');
+
+      image.alt = safeName || 'Payment method';
+      image.loading = 'lazy';
+      image.decoding = 'async';
+
+      image.addEventListener('error', function () {
+        image.remove();
+        iconContainer.textContent = fallbackLetter;
+      }, { once: true });
+
+      // The filename has already been validated.
+      image.src =
+        LOGO_DIRECTORY + encodeURIComponent(fileName);
+
+      iconContainer.appendChild(image);
+
+      return iconContainer;
+    }
+
+    // ============================================================
+    // 14. NORMALIZE WITHDRAWAL RECORD
+    // ============================================================
+
+    function normalizeWithdrawal(paymentId, paymentData) {
+      if (!isPlainObject(paymentData)) {
+        return null;
+      }
+
+      const methodid =
+        typeof paymentData.methodid === 'string'
+          ? paymentData.methodid.trim()
+          : '';
+
+      const amount =
+        getValidNumber(paymentData.amount);
+
+      const exchangeRate =
+        getValidNumber(paymentData.exchangeRate);
+
+      const finalRate =
+        getValidNumber(paymentData.finalRate);
+
+      const rawStatus =
+        typeof paymentData.status === 'string'
+          ? paymentData.status.trim()
+          : '';
+
+      const status =
+        rawStatus || 'Pending';
+
+      const walletaddress =
+        typeof paymentData.walletaddress === 'string'
+          ? paymentData.walletaddress.trim()
+          : '';
+
+      const emailaddress =
+        typeof paymentData.emailaddress === 'string'
+          ? paymentData.emailaddress.trim()
+          : '';
+
+      return {
+        id: paymentId,
+        methodid: methodid,
+        amount: amount,
+        exchangeRate: exchangeRate,
+        finalRate: finalRate,
+        status: status,
+        dateTimestamp: paymentData.dateTimestamp ?? null,
+        walletaddress: walletaddress,
+        emailaddress: emailaddress
+      };
+    }
+
+    // ============================================================
+    // 15. LOAD WITHDRAWAL RECORDS FROM LOCALSTORAGE
+    // ============================================================
+
+    function loadWithdrawalHistory(userData) {
+      if (!isPlainObject(userData)) {
+        return [];
+      }
+
+      const paymentMap = userData.payment;
+
+      if (
+        !isPlainObject(paymentMap) ||
+        Object.keys(paymentMap).length === 0
+      ) {
+        return [];
+      }
+
+      const withdrawals = [];
+
+      for (const [paymentId, paymentData] of Object.entries(paymentMap)) {
+        const record =
+          normalizeWithdrawal(paymentId, paymentData);
+
+        if (record) {
+          withdrawals.push(record);
+        } else {
+          console.warn(
+            'Skipping invalid withdrawal record:',
+            paymentId
+          );
+        }
+      }
+
+      // Newest valid timestamp first.
+      // Records without a valid timestamp appear after dated records.
+      withdrawals.sort((a, b) => {
+        const dateA =
+          getTimestampMillis(a.dateTimestamp);
+
+        const dateB =
+          getTimestampMillis(b.dateTimestamp);
+
+        if (dateA === null && dateB === null) {
+          return 0;
+        }
+
+        if (dateA === null) {
+          return 1;
+        }
+
+        if (dateB === null) {
+          return -1;
+        }
+
+        return dateB - dateA;
+      });
+
+      return withdrawals;
+    }
+
+    // ============================================================
+    // 16. CREATE WITHDRAWAL HISTORY CARD
+    // ============================================================
+
+    function createHistoryCard(item, paymentMethods) {
+      const methodInfo =
+        getPaymentMethodInfo(
+          paymentMethods,
+          item.methodid
+        );
+
+      const methodName =
+        methodInfo.name || item.methodid || 'Unknown';
+
+      const currency =
+        methodInfo.currency || 'USD';
+
+      const amount =
+        item.amount !== null
+          ? item.amount
+          : null;
+
+      const exchangeRate =
+        item.exchangeRate !== null
+          ? item.exchangeRate
+          : methodInfo.exchangeRate;
+
+      const finalRate =
+        item.finalRate !== null
+          ? item.finalRate
+          : (
+              amount !== null &&
+              exchangeRate !== null
+                ? amount * exchangeRate
+                : null
+            );
+
+      // ----------------------------------------------------------
+      // ACCOUNT INFORMATION
+      // ----------------------------------------------------------
+
+      let accountLabel = 'Wallet / Email';
+      let accountValue = '—';
+
+      if (item.walletaddress) {
+        accountLabel = 'Wallet';
+        accountValue = item.walletaddress;
+      } else if (item.emailaddress) {
+        accountLabel = 'Email';
+        accountValue = item.emailaddress;
+      }
+
+      // ----------------------------------------------------------
+      // STATUS
+      // ----------------------------------------------------------
+
+      const normalizedStatus =
+        item.status.toLowerCase();
+
+      let statusClass = 'badge-pending';
+      let displayStatus = item.status;
+
+      if (normalizedStatus === 'completed') {
+        statusClass = 'badge-completed';
+        displayStatus = 'Completed';
+      } else if (normalizedStatus === 'rejected') {
+        statusClass = 'badge-rejected';
+        displayStatus = 'Rejected';
+      } else if (normalizedStatus === 'pending') {
+        statusClass = 'badge-pending';
+        displayStatus = 'Pending';
+      }
+
+      // ----------------------------------------------------------
+      // EXCHANGE RATE
+      // ----------------------------------------------------------
+
+      const rateDisplay =
+        exchangeRate !== null
+          ? `1 Coin = ${formatNumber(exchangeRate, 8)} ${currency}`
+          : `1 Coin = — ${currency}`;
+
+      // ----------------------------------------------------------
+      // CONVERTED AMOUNT
+      // ----------------------------------------------------------
+
+      const receivedDisplay =
+        finalRate !== null && finalRate >= 0
+          ? `${formatNumber(finalRate, 8)} ${currency}`
+          : '—';
+
+      // ----------------------------------------------------------
+      // DATE
+      // ----------------------------------------------------------
+
+      const {
+        date,
+        time
+      } = formatDate(item.dateTimestamp);
+
+      // ----------------------------------------------------------
+      // CARD
+      // ----------------------------------------------------------
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      // Top row.
+      const topRow = document.createElement('div');
+      topRow.className = 'card-row-top';
+
+      const providerInfo = document.createElement('div');
+      providerInfo.className = 'provider-info';
+
+      const providerIcon =
+        createProviderIcon(methodInfo, methodName);
+
+      const providerName = document.createElement('span');
+      providerName.className = 'provider-name';
+      providerName.textContent = methodName;
+
+      providerInfo.appendChild(providerIcon);
+      providerInfo.appendChild(providerName);
+
+      // Status badge.
+      const badge = document.createElement('div');
+      badge.className = `badge ${statusClass}`;
+
+      const badgeDot = document.createElement('span');
+      badgeDot.className = 'badge-dot';
+
+      const badgeText = document.createElement('span');
+      badgeText.textContent = displayStatus;
+
+      badge.appendChild(badgeDot);
+      badge.appendChild(badgeText);
+
+      topRow.appendChild(providerInfo);
+      topRow.appendChild(badge);
+
+      // Account information.
+      const account = document.createElement('div');
+      account.className = 'detail-label';
+      account.textContent =
+        `${accountLabel}: ${accountValue}`;
+
+      // Coin amount.
+      const coins = document.createElement('div');
+      coins.className = 'coins-value';
+      coins.textContent =
+        amount !== null
+          ? `${formatNumber(amount, 2)} Coins`
+          : '— Coins';
+
+      // Bottom row.
+      const bottomRow = document.createElement('div');
+      bottomRow.className = 'rate-and-date';
+
+      // Rate information.
+      const rateInfo = document.createElement('div');
+      rateInfo.className = 'rate-info';
+
+      const rate = document.createElement('span');
+      rate.className = 'exchange-rate';
+      rate.textContent = rateDisplay;
+
+      const received = document.createElement('span');
+      received.className = 'converted-amount';
+      received.textContent = receivedDisplay;
+
+      rateInfo.appendChild(rate);
+      rateInfo.appendChild(received);
+
+      // Date information.
+      const dateInfo = document.createElement('div');
+      dateInfo.className = 'date-info';
+
+      const dateElement = document.createElement('div');
+      dateElement.textContent = date;
+
+      const timeElement = document.createElement('div');
+      timeElement.textContent = time;
+
+      dateInfo.appendChild(dateElement);
+      dateInfo.appendChild(timeElement);
+
+      // Assemble card.
+      bottomRow.appendChild(rateInfo);
+      bottomRow.appendChild(dateInfo);
+
+      card.appendChild(topRow);
+      card.appendChild(account);
+      card.appendChild(coins);
+      card.appendChild(bottomRow);
+
+      return card;
+    }
+
+    // ============================================================
+    // 17. RENDER WITHDRAWAL HISTORY
+    // ============================================================
+
+    function renderHistory(withdrawals, paymentMethods) {
+      container.replaceChildren();
+
+      if (
+        !Array.isArray(withdrawals) ||
+        withdrawals.length === 0
+      ) {
+        showEmptyState(
+          'No withdrawal history available.'
+        );
+        return;
+      }
+
+      const fragment =
+        document.createDocumentFragment();
+
+      withdrawals.forEach((item) => {
+        const card =
+          createHistoryCard(item, paymentMethods);
+
+        fragment.appendChild(card);
+      });
+
+      container.appendChild(fragment);
+    }
+
+    // ============================================================
+    // 18. INITIALIZE HISTORY PAGE
+    // ============================================================
+
+    function initializeHistoryPage() {
+      const result = readUserData();
+
+      if (!result.success) {
+        showErrorState(
+          result.message ||
+          'Unable to load withdrawal history.'
+        );
+        return;
+      }
+
+      if (!result.data) {
+        showEmptyState(
+          'No withdrawal history available.'
+        );
+        return;
+      }
+
+      const userData = result.data;
+
+      const withdrawals =
+        loadWithdrawalHistory(userData);
+
+      if (withdrawals.length === 0) {
+        showEmptyState(
+          'No withdrawal history available.'
+        );
+        return;
+      }
+
+      const paymentMethods =
+        isPlainObject(userData.paymentMethods)
+          ? userData.paymentMethods
+          : {};
+
+      renderHistory(
+        withdrawals,
+        paymentMethods
+      );
+    }
+
+    // ============================================================
+    // 19. INITIAL PAGE LOAD
+    // ============================================================
+
+    // All history data loads directly from LocalStorage.
+    // No Firebase initialization, authentication or network request.
+
+    initializeHistoryPage();
+
+    // ============================================================
+    // 20. LOCALSTORAGE CHANGE LISTENER
+    // ============================================================
+
+    // Refresh the page if this key changes in another browser tab.
+    // The storage event does not fire in the tab that made the change.
+
+    window.addEventListener('storage', function (event) {
+      if (
+        event.key === STORAGE_KEY ||
+        event.key === null
+      ) {
+        initializeHistoryPage();
+      }
+    });
+
+  </script>
+
+</body>
+</html>

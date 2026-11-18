@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Profile</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+
+    <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+    />
+
+    <style>
+        /* ========================================================================
+           1. CSS Variables & Reset (Merged Profile + View Rates theme)
+           ======================================================================== */
+
+        :root {
+            /* ---- Shared navy theme ---- */
+            --theme: #213C5E;
+            --theme-deep: #16293F;
+            --theme-deeper: #0F1E30;
+            --theme-soft: #2C4E76;
+            --theme-softer: #35597F;
+
+            --bg-color: var(--theme-deeper);
+            --surface: var(--theme-deep);
+            --surface-raised: var(--theme);
+            --surface-soft: var(--theme-soft);
+            --surface-softer: var(--theme-softer);
+
+            --card-bg: var(--theme-deep);
+
+            --text-primary: #F1F5F9;
+            --text-secondary: #A9BCD2;
+            --text-muted: #7E93AB;
+
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+
+            --danger-red: #e53935;
+
+            --divider-color: rgba(255, 255, 255, 0.08);
+            --icon-bg: rgba(255, 255, 255, 0.06);
+
+            --border-radius-lg: 20px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 12px;
+
+            --shadow-soft:
+                0 10px 25px -5px rgba(0, 0, 0, 0.4),
+                0 8px 10px -6px rgba(0, 0, 0, 0.3);
+
+            /* ---- View Rates specific ---- */
+            --bg-page: var(--theme-deeper);
+            --bg-app: var(--theme-deep);
+            --bg-header: var(--theme-deep);
+            --bg-card: var(--theme);
+            --bg-card-hover: var(--theme-soft);
+            --bg-scrollbar-thumb: var(--theme-softer);
+
+            --text-on-card: #FFFFFF;
+            --text-symbol: #A0B8D0;
+            --text-rate-label: #8CA8C7;
+            --text-rate-value: #FFFFFF;
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-card-divider: rgba(255, 255, 255, 0.10);
+
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+            --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.45);
+            --shadow-app: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+
+            --radius-card: 20px;
+            --radius-logo: 50%;
+            --header-height: 64px;
+            --max-width: 400px;
+
+            --font-family-rates: 'Inter',
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+
+            --logo-fallback-bg: var(--theme-soft);
+            --logo-fallback-text: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--theme-deeper);
+            color-scheme: dark;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+
+            background-color: var(--theme-deeper);
+            color: var(--text-primary);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ========================================================================
+           2. Main App Container
+           ======================================================================== */
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+
+            height: 100vh;
+            height: 100dvh;
+
+            background-color: var(--bg-color);
+
+            display: flex;
+            flex-direction: column;
+
+            position: relative;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 20px 25px -5px rgba(0, 0, 0, 0.5);
+
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        /* ========================================================================
+           3. View Switching (Profile <-> View Rates)
+           ======================================================================== */
+
+        .view {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+
+            display: flex;
+            flex-direction: column;
+
+            position: relative;
+
+            overflow: hidden;
+
+            animation: viewFadeIn 0.22s ease-out;
+        }
+
+        .view[hidden] {
+            display: none;
+        }
+
+        @keyframes viewFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ========================================================================
+           4. Profile View — Fixed Top Header
+           ======================================================================== */
+
+        .profile-header {
+            position: relative;
+            flex-shrink: 0;
+            width: 100%;
+            height: 56px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0 8px;
+
+            background-color: var(--theme-deep);
+            border-bottom: 1px solid var(--divider-color);
+
+            z-index: 20;
+        }
+
+        .profile-header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            text-align: center;
+            letter-spacing: 0.2px;
+            pointer-events: none;
+        }
+
+        #backBtn {
+            position: absolute;
+            top: 50%;
+            left: 8px;
+
+            transform: translateY(-50%);
+
+            background: transparent;
+            border: none;
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 40px;
+            height: 40px;
+
+            padding: 8px;
+            border-radius: 50%;
+
+            color: var(--text-primary);
+
+            transition:
+                background-color 0.2s ease,
+                transform 0.1s ease;
+
+            z-index: 21;
+        }
+
+        #backBtn:active {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-50%) scale(0.94);
+        }
+
+        /* ========================================================================
+           5. Profile View — Scrollable Content Area
+           ======================================================================== */
+
+        .content-scroll {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+
+            padding: 10px 10px 10px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+
+            scrollbar-width: none;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        /* ========================================================================
+           6. Profile Section
+           ======================================================================== */
+
+        .profile-card {
+            position: relative;
+            flex-shrink: 0;
+
+            background: transparent;
+            border-radius: 0;
+            padding: 10px 16px;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+
+            gap: 14px;
+            box-shadow: none;
+            text-align: left;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+            margin: 0;
+        }
+
+        .avatar-img {
+            width: 72px;
+            height: 72px;
+
+            border-radius: 50%;
+            object-fit: cover;
+
+            border: 2px solid var(--theme-softer);
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.35);
+
+            background-color: var(--theme-soft);
+            display: block;
+        }
+
+        .profile-text {
+            min-width: 0;
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+
+            text-align: left;
+            gap: 2px;
+        }
+
+        .user-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            gap: 6px;
+            margin-bottom: 0;
+
+            width: 100%;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+
+            color: var(--text-primary);
+            line-height: 1.25;
+            text-align: left;
+
+            max-width: 100%;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+
+            min-height: 1.2em;
+            line-height: 1.3;
+            text-align: left;
+            width: 100%;
+
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* ========================================================================
+           7. Statistics (Coins + Diamonds)
+           ======================================================================== */
+
+        .stats-container {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            flex: 1 1 0;
+
+            min-width: 0;
+            min-height: 72px;
+
+            background: var(--surface);
+            border-radius: var(--border-radius-md);
+            padding: 10px;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            box-shadow: none;
+            border: 1px solid var(--divider-color);
+            overflow: hidden;
+        }
+
+        .stat-image {
+            width: 40px;
+            height: 40px;
+
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .stat-info {
+            min-width: 0;
+
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+
+            color: var(--text-primary);
+            line-height: 1.25;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========================================================================
+           8. Menu Section
+           ======================================================================== */
+
+        .menu-card {
+            width: 100%;
+            flex-shrink: 0;
+
+            background: var(--surface);
+            border-radius: var(--border-radius-md);
+
+            box-shadow: none;
+            overflow: hidden;
+
+            border: 1px solid var(--divider-color);
+        }
+
+        .menu-item {
+            width: 100%;
+            min-height: 60px;
+
+            background: transparent;
+            border: none;
+
+            display: flex;
+            align-items: center;
+
+            padding: 12px 16px;
+
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+
+            position: relative;
+
+            transition:
+                background-color 0.2s ease,
+                transform 0.1s ease;
+        }
+
+        .menu-item:active {
+            background-color: var(--surface-soft);
+        }
+
+        .menu-item:not(:last-child)::after {
+            content: '';
+
+            position: absolute;
+            bottom: 0;
+            left: 48px;
+            right: 0;
+
+            height: 1px;
+            background-color: var(--divider-color);
+        }
+
+        .menu-icon-wrapper {
+            width: 24px;
+            height: 24px;
+
+            border-radius: 0;
+            background-color: transparent;
+            color: var(--text-primary);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .menu-title {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .menu-chevron {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* ========================================================================
+           9. Logout Button
+           ======================================================================== */
+
+        .logout-container {
+            width: 100%;
+            flex-shrink: 0;
+
+            margin-top: auto;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            height: 52px;
+            min-height: 52px;
+
+            background-color: var(--danger-red);
+            color: #ffffff;
+
+            border: none;
+            border-radius: 16px;
+
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            cursor: pointer;
+            white-space: nowrap;
+
+            box-shadow:
+                0 4px 12px rgba(229, 57, 53, 0.35);
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.1s ease;
+        }
+
+        .logout-btn:active {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        .logout-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ========================================================================
+           10. Logout Loading Spinner
+           ======================================================================== */
+
+        .logout-spinner {
+            display: inline-block;
+
+            width: 19px;
+            height: 19px;
+            min-width: 19px;
+
+            border: 2px solid rgba(255, 255, 255, 0.30);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+
+            animation: logoutSpin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes logoutSpin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ========================================================================
+           11. View Rates — Header
+           ======================================================================== */
+
+        .view-rates {
+            font-family: var(--font-family-rates);
+            color: var(--text-primary);
+        }
+
+        .rates-header {
+            position: relative;
+            flex-shrink: 0;
+            width: 100%;
+            height: 56px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 8px;
+
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-subtle);
+
+            z-index: 20;
+        }
+
+        .rates-header-btn {
+            background: none;
+            border: none;
+
+            color: var(--text-primary);
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+            flex-shrink: 0;
+
+            transition:
+                background-color 0.2s ease,
+                transform 0.1s ease;
+        }
+
+        .rates-header-btn:active {
+            background-color: var(--theme-soft);
+            transform: scale(0.94);
+        }
+
+        .rates-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            flex: 1 1 auto;
+            min-width: 0;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rates-header-spacer {
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        /* ========================================================================
+           12. View Rates — Scrollable Content
+           ======================================================================== */
+
+        .rates-content {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+
+            padding: 16px;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+
+            scroll-behavior: smooth;
+
+            background-color: var(--bg-page);
+        }
+
+        .rates-content::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .rates-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .rates-content::-webkit-scrollbar-thumb {
+            background: var(--bg-scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        .rates-content::-webkit-scrollbar-thumb:hover {
+            background: var(--theme-soft);
+        }
+
+        .rates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 16px;
+        }
+
+        /* ========================================================================
+           13. Rate Card Design
+           ======================================================================== */
+
+        .rate-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-card);
+            padding: 16px;
+
+            box-shadow: var(--shadow-card);
+
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+
+            animation: rateCardFadeIn 0.4s ease-out forwards;
+            opacity: 0;
+
+            border: 1px solid var(--border-subtle);
+
+            min-width: 0;
+        }
+
+        .rate-card:active {
+            transform: scale(0.98);
+            background-color: var(--bg-card-hover);
+        }
+
+        @media (hover: hover) {
+            .rate-card:hover {
+                box-shadow: var(--shadow-card-hover);
+                transform: translateY(-1px);
+                background-color: var(--bg-card-hover);
+            }
+        }
+
+        .card-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .coin-logo {
+            width: 36px;
+            height: 36px;
+
+            border-radius: var(--radius-logo);
+            object-fit: cover;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background-color: var(--logo-fallback-bg);
+            color: var(--logo-fallback-text);
+
+            font-weight: 600;
+            font-size: 14px;
+
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .coin-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .coin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-on-card);
+
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
+        .coin-symbol {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-symbol);
+            text-align: right;
+
+            overflow-wrap: anywhere;
+
+            margin-left: 8px;
+            flex-shrink: 0;
+            max-width: 45%;
+        }
+
+        .card-second-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-card-divider);
+
+            min-width: 0;
+        }
+
+        .rate-label {
+            font-size: 13px;
+            color: var(--text-rate-label);
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .rate-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-rate-value);
+            text-align: right;
+
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
+        /* ========================================================================
+           14. Empty State
+           ======================================================================== */
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            padding: 48px 24px;
+
+            color: var(--text-secondary);
+            text-align: center;
+            gap: 8px;
+            opacity: 0.9;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        .empty-state .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .empty-state .empty-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ========================================================================
+           15. Animations & Reduced Motion
+           ======================================================================== */
+
+        @keyframes rateCardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .logout-spinner {
+                animation-duration: 1.5s;
+            }
+
+            .view,
+            .rate-card {
+                animation: none !important;
+                opacity: 1;
+            }
+
+            .rates-content {
+                scroll-behavior: auto;
+            }
+        }
+
+        /* ========================================================================
+           16. Small Screen Safety
+           ======================================================================== */
+
+        @media (max-width: 340px) {
+            .stat-card {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .stat-image {
+                width: 32px;
+                height: 32px;
+            }
+
+            .rates-content {
+                padding: 12px;
+            }
+
+            .rate-card {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="app-container" id="appContainer">
+
+        <!-- ====================================================================
+             VIEW 1 — PROFILE (DEFAULT)
+             ==================================================================== -->
+
+        <section
+            class="view view-profile"
+            id="profileView"
+        >
+
+            <!-- FIXED TOP HEADER -->
+
+            <header class="profile-header">
+
+                <button
+                    id="backBtn"
+                    type="button"
+                    aria-label="Go back"
+                >
+                    <span class="material-icons">
+                        arrow_back
+                    </span>
+                </button>
+
+                <h1>
+                    Profile
+                </h1>
+
+            </header>
+
+            <!-- SCROLLABLE CONTENT -->
+
+            <div class="content-scroll" id="contentScroll">
+
+                <!-- PROFILE SECTION -->
+
+                <section class="profile-card">
+
+                    <div class="avatar-wrapper">
+
+                        <img
+                            src=""
+                            alt="Profile"
+                            class="avatar-img real-avatar"
+                            id="profileAvatar"
+                        />
+
+                    </div>
+
+                    <div class="profile-text">
+
+                        <div class="user-name-row real-name-row">
+
+                            <h2
+                                class="user-name"
+                                id="userName"
+                            >USER</h2>
+
+                        </div>
+
+                        <p
+                            class="user-email real-email"
+                            id="userEmail"
+                        ></p>
+
+                    </div>
+
+                </section>
+
+                <!-- STATISTICS -->
+
+                <section class="stats-container">
+
+                    <!-- COINS -->
+
+                    <div class="stat-card">
+
+                        <img
+                            src="picture_resource/icon/coin.png"
+                            alt="Gold Coin"
+                            class="stat-image real-stat-image"
+                        />
+
+                        <div class="stat-info real-stat-info">
+
+                            <span class="stat-label">
+                                Coins
+                            </span>
+
+                            <span
+                                class="stat-value"
+                                id="coinValue"
+                            >0</span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- DIAMONDS -->
+
+                    <div class="stat-card">
+
+                        <img
+                            src="picture_resource/icon/dimon.png"
+                            alt="Diamond"
+                            class="stat-image"
+                        />
+
+                        <div class="stat-info">
+
+                            <span class="stat-label">
+                                Diamonds
+                            </span>
+
+                            <span
+                                class="stat-value"
+                                id="diamondValue"
+                            >0</span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- MENU -->
+
+                <section class="menu-card">
+
+                    <!-- PAYMENT HISTORY -->
+
+                    <button
+                        class="menu-item"
+                        data-menu="Payment History"
+                        type="button"
+                        aria-label="Payment History"
+                    >
+
+                        <div class="menu-icon-wrapper">
+
+                            <span class="material-icons">
+                                history
+                            </span>
+
+                        </div>
+
+                        <span class="menu-title">
+                            Payment History
+                        </span>
+
+                        <span class="material-icons menu-chevron">
+                            chevron_right
+                        </span>
+
+                    </button>
+
+                    <!-- RATE -->
+
+                    <button
+                        class="menu-item"
+                        data-menu="Rate"
+                        type="button"
+                        aria-label="Rate"
+                    >
+
+                        <div class="menu-icon-wrapper">
+
+                            <span class="material-icons">
+                                star_rate
+                            </span>
+
+                        </div>
+
+                        <span class="menu-title">
+                            Rate
+                        </span>
+
+                        <span class="material-icons menu-chevron">
+                            chevron_right
+                        </span>
+
+                    </button>
+
+                    <!-- WITHDRAWAL -->
+
+                    <button
+                        class="menu-item"
+                        data-menu="Withdrawal"
+                        type="button"
+                        aria-label="Withdrawal"
+                    >
+
+                        <div class="menu-icon-wrapper">
+
+                            <span class="material-icons">
+                                account_balance_wallet
+                            </span>
+
+                        </div>
+
+                        <span class="menu-title">
+                            Withdrawal
+                        </span>
+
+                        <span class="material-icons menu-chevron">
+                            chevron_right
+                        </span>
+
+                    </button>
+
+                </section>
+
+                <!-- LOGOUT -->
+
+                <div class="logout-container">
+
+                    <button
+                        class="logout-btn"
+                        id="logoutBtn"
+                        type="button"
+                        aria-label="Logout"
+                    >
+
+                        <span
+                            class="material-icons"
+                            id="logoutIcon"
+                        >
+                            logout
+                        </span>
+
+                        <span id="logoutText">
+                            Logout
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ====================================================================
+             VIEW 2 — VIEW RATES (HIDDEN BY DEFAULT)
+             ==================================================================== -->
+
+        <section
+            class="view view-rates"
+            id="ratesView"
+            hidden
+        >
+
+            <!-- HEADER -->
+
+            <header class="rates-header">
+
+                <button
+                    class="rates-header-btn"
+                    id="ratesBackBtn"
+                    type="button"
+                    aria-label="Go Back"
+                >
+                    <span class="material-icons">arrow_back</span>
+                </button>
+
+                <h1 class="rates-header-title">
+                    View Rates
+                </h1>
+
+                <div class="rates-header-spacer"></div>
+
+            </header>
+
+            <!-- SCROLLABLE CONTENT -->
+
+            <div class="rates-content" id="ratesContent">
+
+                <div
+                    class="rates-list"
+                    id="ratesContainer"
+                    aria-live="polite"
+                ></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ========================================================================
+         VIEW RATES — RENDERING SCRIPT
+         (Isolated scope — no globals except window.initializeRatesPage)
+         ======================================================================== -->
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ============================================================
+            // 1. CONFIGURATION
+            // ============================================================
+
+            var RATES_STORAGE_KEY = 'userDatakv9688658vs';
+            var LOGO_FOLDER = 'cripto_currency/';
+
+            // ============================================================
+            // 2. DOM REFERENCES
+            // ============================================================
+
+            var ratesContainer =
+                document.getElementById('ratesContainer');
+
+            if (!ratesContainer) {
+                return;
+            }
+
+            // ============================================================
+            // 3. LOGO PATH VALIDATOR
+            // ============================================================
+
+            function getLogoPath(fileName) {
+                if (
+                    typeof fileName !== 'string' ||
+                    !fileName.trim()
+                ) {
+                    return '';
+                }
+
+                var safeFileName = fileName.trim();
+
+                // Only accept a filename, never a URL or folder path.
+                if (
+                    safeFileName.indexOf('/') !== -1 ||
+                    safeFileName.indexOf('\\') !== -1 ||
+                    safeFileName.indexOf('://') !== -1 ||
+                    safeFileName === '.' ||
+                    safeFileName === '..' ||
+                    safeFileName.indexOf('..') !== -1 ||
+                    !/^[a-zA-Z0-9][a-zA-Z0-9._ -]*\.(png|jpe?g|gif|webp|svg)$/i.test(safeFileName)
+                ) {
+                    return '';
+                }
+
+                return LOGO_FOLDER + encodeURIComponent(safeFileName);
+            }
+
+            // ============================================================
+            // 4. EMPTY STATE RENDERER
+            // ============================================================
+
+            function renderEmptyState() {
+                ratesContainer.replaceChildren();
+
+                var emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+
+                var icon = document.createElement('div');
+                icon.className = 'empty-icon';
+                icon.textContent = '💳';
+
+                var title = document.createElement('div');
+                title.className = 'empty-title';
+                title.textContent = 'No Payment Methods';
+
+                var subtitle = document.createElement('div');
+                subtitle.className = 'empty-subtitle';
+                subtitle.textContent = 'No payment methods available at this time.';
+
+                emptyState.appendChild(icon);
+                emptyState.appendChild(title);
+                emptyState.appendChild(subtitle);
+
+                ratesContainer.appendChild(emptyState);
+            }
+
+            // ============================================================
+            // 5. VALIDATE PAYMENT METHOD DATA
+            // ============================================================
+
+            function validatePaymentMethods(rawPaymentMethods) {
+                if (
+                    !rawPaymentMethods ||
+                    typeof rawPaymentMethods !== 'object' ||
+                    Array.isArray(rawPaymentMethods)
+                ) {
+                    return [];
+                }
+
+                var validMethods = [];
+
+                var entries = Object.entries(rawPaymentMethods);
+
+                for (var i = 0; i < entries.length; i++) {
+                    var methodId = entries[i][0];
+                    var data = entries[i][1];
+
+                    if (
+                        !data ||
+                        typeof data !== 'object' ||
+                        Array.isArray(data)
+                    ) {
+                        console.warn(
+                            'Skipping invalid payment method:',
+                            methodId
+                        );
+                        continue;
+                    }
+
+                    var name =
+                        typeof data.name === 'string'
+                            ? data.name.trim()
+                            : '';
+
+                    var currency =
+                        typeof data.currency === 'string'
+                            ? data.currency.trim()
+                            : '';
+
+                    // Do not convert arbitrary strings or null into a number.
+                    var exchangeRate = data.exchangeRate;
+
+                    if (
+                        !name ||
+                        !currency ||
+                        typeof exchangeRate !== 'number' ||
+                        !Number.isFinite(exchangeRate)
+                    ) {
+                        console.warn(
+                            'Skipping payment method with invalid required fields:',
+                            methodId
+                        );
+                        continue;
+                    }
+
+                    validMethods.push({
+                        id: methodId,
+                        name: name,
+                        currency: currency,
+                        exchangeRate: exchangeRate,
+                        logoUrl:
+                            typeof data.logoUrl === 'string'
+                                ? data.logoUrl.trim()
+                                : '',
+                        type: data.type
+                    });
+                }
+
+                // Case-insensitive alphabetical sorting.
+                validMethods.sort(function (a, b) {
+                    return a.name.localeCompare(
+                        b.name,
+                        undefined,
+                        { sensitivity: 'base' }
+                    );
+                });
+
+                return validMethods;
+            }
+
+            // ============================================================
+            // 6. READ PAYMENT METHODS FROM LOCALSTORAGE
+            // ============================================================
+
+            function loadPaymentMethods() {
+                try {
+                    var storedData =
+                        localStorage.getItem(RATES_STORAGE_KEY);
+
+                    if (
+                        typeof storedData !== 'string' ||
+                        !storedData.trim()
+                    ) {
+                        return [];
+                    }
+
+                    var parsedData;
+
+                    try {
+                        parsedData = JSON.parse(storedData);
+                    } catch (error) {
+                        console.error(
+                            'Invalid JSON in LocalStorage:',
+                            error
+                        );
+                        return [];
+                    }
+
+                    if (
+                        !parsedData ||
+                        typeof parsedData !== 'object' ||
+                        Array.isArray(parsedData)
+                    ) {
+                        console.warn(
+                            'Stored user data is not a valid object.'
+                        );
+                        return [];
+                    }
+
+                    if (
+                        !Object.prototype.hasOwnProperty.call(
+                            parsedData,
+                            'paymentMethods'
+                        )
+                    ) {
+                        console.warn(
+                            'paymentMethods is missing from LocalStorage data.'
+                        );
+                        return [];
+                    }
+
+                    return validatePaymentMethods(
+                        parsedData.paymentMethods
+                    );
+
+                } catch (error) {
+                    console.error(
+                        'LocalStorage access error:',
+                        error
+                    );
+                    return [];
+                }
+            }
+
+            // ============================================================
+            // 7. LOGO RENDERING
+            // ============================================================
+
+            function createLogo(method) {
+                var logoContainer = document.createElement('div');
+                logoContainer.className = 'coin-logo';
+
+                var firstLetter =
+                    method.name.charAt(0).toUpperCase() || '?';
+
+                // Display fallback letter immediately.
+                logoContainer.textContent = firstLetter;
+
+                var logoPath = getLogoPath(method.logoUrl);
+
+                // Missing or invalid logo filename:
+                // keep the fallback letter.
+                if (!logoPath) {
+                    return logoContainer;
+                }
+
+                var img = new Image();
+
+                img.alt = method.name;
+                img.decoding = 'async';
+
+                img.onload = function () {
+                    // Do not replace the fallback if the card was removed.
+                    if (!logoContainer.isConnected) {
+                        return;
+                    }
+
+                    logoContainer.replaceChildren();
+                    logoContainer.style.backgroundColor = 'transparent';
+                    logoContainer.appendChild(img);
+                };
+
+                img.onerror = function () {
+                    if (!logoContainer.isConnected) {
+                        return;
+                    }
+
+                    // Restore fallback letter if image loading fails.
+                    logoContainer.replaceChildren();
+                    logoContainer.style.backgroundColor =
+                        'var(--logo-fallback-bg)';
+                    logoContainer.textContent = firstLetter;
+
+                    console.warn(
+                        'Payment logo could not be loaded:',
+                        method.logoUrl
+                    );
+                };
+
+                img.src = logoPath;
+
+                return logoContainer;
+            }
+
+            // ============================================================
+            // 8. PAYMENT METHOD CARD RENDERER
+            // ============================================================
+
+            function createRateCard(method, index) {
+                var card = document.createElement('div');
+
+                card.className = 'rate-card';
+                card.style.animationDelay = (index * 0.05) + 's';
+
+                // ------------------------------
+                // Logo and payment method name
+                // ------------------------------
+
+                var coinInfo = document.createElement('div');
+                coinInfo.className = 'coin-info';
+
+                var logo = createLogo(method);
+                coinInfo.appendChild(logo);
+
+                var nameSpan = document.createElement('span');
+                nameSpan.className = 'coin-name';
+                nameSpan.textContent = method.name;
+
+                coinInfo.appendChild(nameSpan);
+
+                // ------------------------------
+                // Top row
+                // ------------------------------
+
+                var topRow = document.createElement('div');
+                topRow.className = 'card-top-row';
+
+                topRow.appendChild(coinInfo);
+
+                var symbolSpan = document.createElement('span');
+                symbolSpan.className = 'coin-symbol';
+                symbolSpan.textContent = method.currency;
+
+                topRow.appendChild(symbolSpan);
+
+                // ------------------------------
+                // Exchange rate row
+                // ------------------------------
+
+                var secondRow = document.createElement('div');
+                secondRow.className = 'card-second-row';
+
+                var rateLabel = document.createElement('span');
+                rateLabel.className = 'rate-label';
+                rateLabel.textContent = 'Exchange Rate';
+
+                var rateValue = document.createElement('span');
+                rateValue.className = 'rate-value';
+
+                var formattedRate =
+                    method.exchangeRate.toFixed(4);
+
+                rateValue.textContent =
+                    '1 Coin = ' + formattedRate + ' ' + method.currency;
+
+                secondRow.appendChild(rateLabel);
+                secondRow.appendChild(rateValue);
+
+                // ------------------------------
+                // Assemble card
+                // ------------------------------
+
+                card.appendChild(topRow);
+                card.appendChild(secondRow);
+
+                return card;
+            }
+
+            // ============================================================
+            // 9. RENDER ALL PAYMENT METHODS
+            // ============================================================
+
+            function renderRates(paymentMethods) {
+                ratesContainer.replaceChildren();
+
+                if (
+                    !Array.isArray(paymentMethods) ||
+                    paymentMethods.length === 0
+                ) {
+                    renderEmptyState();
+                    return;
+                }
+
+                var fragment = document.createDocumentFragment();
+
+                paymentMethods.forEach(function (method, index) {
+                    fragment.appendChild(
+                        createRateCard(method, index)
+                    );
+                });
+
+                ratesContainer.appendChild(fragment);
+            }
+
+            // ============================================================
+            // 10. INITIAL PAGE LOAD
+            // ============================================================
+
+            function initializePage() {
+                var paymentMethods = loadPaymentMethods();
+                renderRates(paymentMethods);
+            }
+
+            // Expose a single controlled hook for the Profile module.
+            window.initializeRatesPage = initializePage;
+
+            // Load immediately without Firebase or network requests.
+            initializePage();
+
+            // ============================================================
+            // 11. LOCALSTORAGE CHANGE LISTENER
+            // ============================================================
+
+            // If another browser tab updates this key, refresh the cards.
+            window.addEventListener('storage', function (event) {
+                if (
+                    event.key !== RATES_STORAGE_KEY &&
+                    event.key !== null
+                ) {
+                    return;
+                }
+
+                initializePage();
+            });
+
+        })();
+    </script>
+
+    <!-- ========================================================================
+         PROFILE + FIREBASE AUTHENTICATION LOGOUT + VIEW SWITCHING SCRIPT
+         ======================================================================== -->
+
+    <script type="module">
+
+        // ======================================================================
+        // 1. FIREBASE AUTHENTICATION IMPORT
+        // ======================================================================
+
+        import { auth } from "./firebase.js";
+
+        import {
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+        // ======================================================================
+        // 2. LOCALSTORAGE CONFIGURATION
+        // ======================================================================
+
+        const STORAGE_KEY = "userDatakv9688658vs";
+
+        const DEFAULT_AVATAR_COLOR = "#e8ecf1";
+
+
+        // ======================================================================
+        // 3. DOM REFERENCES
+        // ======================================================================
+
+        const userEmailEl =
+            document.getElementById("userEmail");
+
+        const userNameEl =
+            document.getElementById("userName");
+
+        const profileAvatar =
+            document.getElementById("profileAvatar");
+
+        const coinValueEl =
+            document.getElementById("coinValue");
+
+        const diamondValueEl =
+            document.getElementById("diamondValue");
+
+        const logoutBtn =
+            document.getElementById("logoutBtn");
+
+        const logoutIcon =
+            document.getElementById("logoutIcon");
+
+        const logoutText =
+            document.getElementById("logoutText");
+
+        const backBtn =
+            document.getElementById("backBtn");
+
+        // ---- View switching references ----
+
+        const profileView =
+            document.getElementById("profileView");
+
+        const ratesView =
+            document.getElementById("ratesView");
+
+        const ratesContentEl =
+            document.getElementById("ratesContent");
+
+        const ratesBackBtn =
+            document.getElementById("ratesBackBtn");
+
+
+        // ======================================================================
+        // 4. APPLICATION STATE
+        // ======================================================================
+
+        let isLoggingOut = false;
+
+        let currentUserData = null;
+
+        let avatarRequestId = 0;
+
+        let logoutSpinner = null;
+
+
+        // ======================================================================
+        // 5. ALLOWED ACCOUNT COLORS
+        // ======================================================================
+
+        const ACCOUNT_COLORS = [
+
+            "#EF4444",
+            "#F97316",
+            "#F59E0B",
+            "#10B981",
+            "#06B6D4",
+            "#3B82F6",
+            "#6366F1",
+            "#8B5CF6",
+            "#EC4899",
+            "#14B8A6"
+
+        ];
+
+
+        // ======================================================================
+        // 6. VIEW SWITCHING (Profile <-> View Rates)
+        // ======================================================================
+
+        function showRatesView() {
+
+            if (!profileView || !ratesView) {
+                return;
+            }
+
+
+            // Hide the Profile view.
+
+            profileView.hidden = true;
+
+
+            // Show the View Rates view.
+
+            ratesView.hidden = false;
+
+
+            // Refresh the rates from LocalStorage each time the view opens.
+
+            if (typeof window.initializeRatesPage === "function") {
+
+                try {
+
+                    window.initializeRatesPage();
+
+                } catch (error) {
+
+                    console.error(
+                        "Unable to refresh payment rates:",
+                        error
+                    );
+
+                }
+
+            }
+
+
+            // Reset the rates scroll position.
+
+            if (ratesContentEl) {
+
+                ratesContentEl.scrollTop = 0;
+
+            }
+
+        }
+
+
+        function showProfileView() {
+
+            if (!profileView || !ratesView) {
+                return;
+            }
+
+
+            // Hide the View Rates view.
+
+            ratesView.hidden = true;
+
+
+            // Show the Profile view.
+
+            profileView.hidden = false;
+
+        }
+
+
+        // ======================================================================
+        // 7. VALIDATE USER DATA OBJECT
+        // ======================================================================
+
+        function isValidUserData(data) {
+
+            if (
+                data === null ||
+                typeof data !== "object" ||
+                Array.isArray(data)
+            ) {
+
+                return false;
+
+            }
+
+
+            const allowedFields = [
+                "name",
+                "email",
+                "color",
+                "coin",
+                "diamond",
+                "profileUrl"
+            ];
+
+
+            return allowedFields.some((field) =>
+                Object.prototype.hasOwnProperty.call(data, field)
+            );
+
+        }
+
+
+        // ======================================================================
+        // 8. READ PROFILE DATA FROM LOCALSTORAGE
+        // ======================================================================
+
+        function readUserData() {
+
+            try {
+
+                const storedData =
+                    localStorage.getItem(STORAGE_KEY);
+
+
+                if (!storedData) {
+
+                    return null;
+
+                }
+
+
+                const userData =
+                    JSON.parse(storedData);
+
+
+                if (!isValidUserData(userData)) {
+
+                    console.warn(
+                        "Invalid profile data in LocalStorage."
+                    );
+
+                    return null;
+
+                }
+
+
+                return userData;
+
+            } catch (error) {
+
+                console.error(
+                    "Unable to read profile data from LocalStorage:",
+                    error
+                );
+
+                return null;
+
+            }
+
+        }
+
+
+        // ======================================================================
+        // 9. GENERATE SVG AVATAR
+        // ======================================================================
+
+        function generateAvatarSVG(
+            firstLetter,
+            bgColor = DEFAULT_AVATAR_COLOR,
+            textColor = "#ffffff"
+        ) {
+
+            const letter =
+                (
+                    typeof firstLetter === "string" &&
+                    firstLetter.length > 0
+                )
+                    ? firstLetter.charAt(0).toUpperCase()
+                    : "U";
+
+
+            const safeLetter =
+                letter
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&apos;");
+
+
+            return `
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="160"
+                    height="160"
+                    viewBox="0 0 160 160"
+                >
+
+                    <rect
+                        width="160"
+                        height="160"
+                        rx="80"
+                        fill="${bgColor}"
+                    />
+
+                    <text
+                        x="80"
+                        y="80"
+                        text-anchor="middle"
+                        dominant-baseline="central"
+                        font-family="Arial, sans-serif"
+                        font-size="76"
+                        font-weight="500"
+                        fill="${textColor}"
+                    >
+                        ${safeLetter}
+                    </text>
+
+                </svg>
+            `;
+
+        }
+
+
+        // ======================================================================
+        // 10. CONVERT SVG TO DATA URI
+        // ======================================================================
+
+        function svgToDataUri(svgString) {
+
+            return (
+                "data:image/svg+xml;charset=UTF-8," +
+                encodeURIComponent(svgString)
+            );
+
+        }
+
+
+        // ======================================================================
+        // 11. VALIDATE ACCOUNT COLOR
+        // ======================================================================
+
+        function getValidAccountColor(color) {
+
+            if (
+                typeof color === "string" &&
+                ACCOUNT_COLORS.includes(color.toUpperCase())
+            ) {
+
+                return color.toUpperCase();
+
+            }
+
+            return DEFAULT_AVATAR_COLOR;
+
+        }
+
+
+        // ======================================================================
+        // 12. GENERATE FALLBACK AVATAR
+        // ======================================================================
+
+        function setFallbackAvatar(
+            name = "USER",
+            color = DEFAULT_AVATAR_COLOR
+        ) {
+
+            const firstLetter =
+                (
+                    typeof name === "string" &&
+                    name.trim() !== ""
+                )
+                    ? name.trim().charAt(0)
+                    : "U";
+
+
+            const safeColor =
+                getValidAccountColor(color);
+
+
+            const svg =
+                generateAvatarSVG(
+                    firstLetter,
+                    safeColor,
+                    "#ffffff"
+                );
+
+
+            if (profileAvatar) {
+
+                profileAvatar.onerror = null;
+
+                profileAvatar.style.backgroundColor =
+                    safeColor;
+
+                profileAvatar.src =
+                    svgToDataUri(svg);
+
+            }
+
+        }
+
+
+        // ======================================================================
+        // 13. VALIDATE PROFILE IMAGE SOURCE
+        // ======================================================================
+
+        function isValidPhotoSource(photo) {
+
+            if (
+                typeof photo !== "string" ||
+                photo.trim() === ""
+            ) {
+
+                return false;
+
+            }
+
+
+            const source = photo.trim();
+
+
+            // Allow HTTP and HTTPS image URLs.
+
+            if (/^https?:\/\//i.test(source)) {
+
+                try {
+
+                    const parsedUrl =
+                        new URL(source);
+
+                    return (
+                        (
+                            parsedUrl.protocol === "https:" ||
+                            parsedUrl.protocol === "http:"
+                        ) &&
+                        parsedUrl.hostname !== ""
+                    );
+
+                } catch {
+
+                    return false;
+
+                }
+
+            }
+
+
+            // Allow Base64 image data URLs.
+
+            if (
+                /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,[a-z0-9+/=]+$/i.test(source)
+            ) {
+
+                return true;
+
+            }
+
+
+            // Reject unsupported schemes and protocol-relative URLs.
+
+            if (
+                /^[a-z][a-z0-9+.-]*:/i.test(source) ||
+                source.startsWith("//")
+            ) {
+
+                return false;
+
+            }
+
+
+            // Allow local relative image paths.
+
+            try {
+
+                const parsedUrl =
+                    new URL(source, window.location.href);
+
+                return (
+                    parsedUrl.origin === window.location.origin &&
+                    (
+                        parsedUrl.protocol === "http:" ||
+                        parsedUrl.protocol === "https:"
+                    )
+                );
+
+            } catch {
+
+                return false;
+
+            }
+
+        }
+
+
+        // ======================================================================
+        // 14. APPLY PROFILE PHOTO
+        // ======================================================================
+
+        function applyProfilePhoto(
+            profileUrl,
+            name,
+            color
+        ) {
+
+            if (!profileAvatar) {
+                return;
+            }
+
+
+            // Create a unique request ID for every avatar update.
+
+            const requestId =
+                ++avatarRequestId;
+
+
+            const safeColor =
+                getValidAccountColor(color);
+
+
+            // Missing or invalid image: use fallback avatar.
+
+            if (!isValidPhotoSource(profileUrl)) {
+
+                setFallbackAvatar(
+                    name,
+                    safeColor
+                );
+
+                return;
+
+            }
+
+
+            // Use fallback if the requested image fails to load.
+
+            profileAvatar.onerror = () => {
+
+                if (requestId !== avatarRequestId) {
+                    return;
+                }
+
+
+                profileAvatar.onerror = null;
+
+                setFallbackAvatar(
+                    name,
+                    safeColor
+                );
+
+            };
+
+
+            profileAvatar.style.backgroundColor =
+                safeColor;
+
+
+            profileAvatar.src =
+                profileUrl.trim();
+
+        }
+
+
+        // ======================================================================
+        // 15. VALIDATE COIN AND DIAMOND VALUES
+        // ======================================================================
+
+        function getValidNumber(value) {
+
+            if (
+                typeof value !== "number" ||
+                !Number.isFinite(value) ||
+                value < 0
+            ) {
+
+                return 0;
+
+            }
+
+            return value;
+
+        }
+
+
+        // ======================================================================
+        // 16. RESET PROFILE UI
+        // ======================================================================
+
+        function resetProfileUI() {
+
+            currentUserData = null;
+
+
+            if (userNameEl) {
+
+                userNameEl.textContent = "USER";
+
+            }
+
+
+            if (userEmailEl) {
+
+                userEmailEl.textContent = "";
+
+            }
+
+
+            if (coinValueEl) {
+
+                coinValueEl.textContent = "0";
+
+            }
+
+
+            if (diamondValueEl) {
+
+                diamondValueEl.textContent = "0";
+
+            }
+
+
+            setFallbackAvatar(
+                "USER",
+                DEFAULT_AVATAR_COLOR
+            );
+
+        }
+
+
+        // ======================================================================
+        // 17. DISPLAY LOCALSTORAGE PROFILE DATA
+        // ======================================================================
+
+        function displayProfileData(userData) {
+
+            if (!isValidUserData(userData)) {
+
+                resetProfileUI();
+
+                return;
+
+            }
+
+
+            currentUserData = userData;
+
+
+            // NAME
+
+            const name =
+                (
+                    typeof userData.name === "string" &&
+                    userData.name.trim() !== ""
+                )
+                    ? userData.name.trim()
+                    : "USER";
+
+
+            if (userNameEl) {
+
+                userNameEl.textContent =
+                    name;
+
+            }
+
+
+            // EMAIL
+
+            const email =
+                (
+                    typeof userData.email === "string" &&
+                    userData.email.trim() !== ""
+                )
+                    ? userData.email.trim()
+                    : "";
+
+
+            if (userEmailEl) {
+
+                userEmailEl.textContent =
+                    email;
+
+            }
+
+
+            // PROFILE COLOR
+
+            const color =
+                getValidAccountColor(
+                    userData.color
+                );
+
+
+            // PROFILE IMAGE
+
+            applyProfilePhoto(
+                userData.profileUrl,
+                name,
+                color
+            );
+
+
+            // COINS
+
+            const coins =
+                getValidNumber(
+                    userData.coin
+                );
+
+
+            if (coinValueEl) {
+
+                coinValueEl.textContent =
+                    coins.toLocaleString();
+
+            }
+
+
+            // DIAMONDS
+
+            const diamonds =
+                getValidNumber(
+                    userData.diamond
+                );
+
+
+            if (diamondValueEl) {
+
+                diamondValueEl.textContent =
+                    diamonds.toLocaleString();
+
+            }
+
+        }
+
+
+        // ======================================================================
+        // 18. LOAD PROFILE FROM LOCALSTORAGE
+        // ======================================================================
+
+        function loadUserProfile() {
+
+            // Do not update the page during an active logout.
+
+            if (isLoggingOut) {
+                return;
+            }
+
+
+            const userData =
+                readUserData();
+
+
+            if (!userData) {
+
+                resetProfileUI();
+
+                return;
+
+            }
+
+
+            displayProfileData(userData);
+
+        }
+
+
+        // ======================================================================
+        // 19. LOGOUT BUTTON LOADING STATE
+        // ======================================================================
+
+        function startLogoutLoading() {
+
+            if (!logoutBtn) {
+                return;
+            }
+
+
+            // Disable immediately.
+
+            logoutBtn.disabled = true;
+
+
+            // Create spinner.
+
+            logoutSpinner =
+                document.createElement("span");
+
+            logoutSpinner.className =
+                "logout-spinner";
+
+            logoutSpinner.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+
+            // Hide original logout icon.
+
+            if (logoutIcon) {
+
+                logoutIcon.hidden = true;
+
+            }
+
+
+            // Replace button text.
+
+            if (logoutText) {
+
+                logoutText.textContent =
+                    "Logging out...";
+
+            }
+
+
+            // Insert spinner before text.
+
+            logoutBtn.insertBefore(
+                logoutSpinner,
+                logoutText
+            );
+
+
+            logoutBtn.setAttribute(
+                "aria-label",
+                "Logging out"
+            );
+
+        }
+
+
+        // ======================================================================
+        // 20. RESTORE LOGOUT BUTTON AFTER FAILURE
+        // ======================================================================
+
+        function restoreLogoutButton() {
+
+            if (!logoutBtn) {
+                return;
+            }
+
+
+            // Remove spinner.
+
+            if (logoutSpinner) {
+
+                logoutSpinner.remove();
+
+                logoutSpinner = null;
+
+            }
+
+
+            // Restore original icon.
+
+            if (logoutIcon) {
+
+                logoutIcon.hidden = false;
+
+            }
+
+
+            // Restore original button text.
+
+            if (logoutText) {
+
+                logoutText.textContent =
+                    "Logout";
+
+            }
+
+
+            logoutBtn.setAttribute(
+                "aria-label",
+                "Logout"
+            );
+
+
+            // Allow another logout attempt.
+
+            logoutBtn.disabled = false;
+
+        }
+
+
+        // ======================================================================
+        // 21. LOGOUT FUNCTIONALITY
+        // Firebase Authentication signOut() ONLY
+        // ======================================================================
+
+        async function handleLogout() {
+
+            // Prevent duplicate logout requests.
+
+            if (isLoggingOut) {
+                return;
+            }
+
+
+            isLoggingOut = true;
+
+
+            // IMPORTANT:
+            // The button is disabled and spinner starts immediately.
+            // This happens BEFORE waiting for Firebase initialization.
+
+            startLogoutLoading();
+
+
+            try {
+
+                // ----------------------------------------------------------
+                // WAIT FOR FIREBASE AUTH INITIALIZATION
+                // ----------------------------------------------------------
+                //
+                // If Firebase Auth is still initializing, this promise
+                // waits until the initial Auth state has been determined.
+                //
+                // The user's logout request is not lost.
+                //
+                // The button remains disabled and spinner keeps running.
+                // ----------------------------------------------------------
+
+                await auth.authStateReady();
+
+
+                // ----------------------------------------------------------
+                // SIGN OUT FROM FIREBASE AUTHENTICATION
+                // ----------------------------------------------------------
+                //
+                // This is the only Firebase operation on this page.
+                // ----------------------------------------------------------
+
+                await signOut(auth);
+
+
+            } catch (error) {
+
+                // ----------------------------------------------------------
+                // LOGOUT FAILED
+                // ----------------------------------------------------------
+
+                console.error(
+                    "Firebase Authentication sign-out failed:",
+                    error
+                );
+
+
+                // Reset logout state.
+
+                isLoggingOut = false;
+
+
+                // Restore the original button.
+
+                restoreLogoutButton();
+
+
+                // Do not remove LocalStorage data.
+
+                alert(
+                    "Logout failed. Please check your connection and try again."
+                );
+
+                return;
+
+            }
+
+
+            // ==================================================================
+            // SIGN-OUT SUCCESSFUL
+            // ==================================================================
+
+            // Clear in-memory profile data.
+
+            currentUserData = null;
+
+
+            // Remove ONLY the profile LocalStorage key.
+            // Do not clear unrelated LocalStorage entries.
+
+            try {
+
+                localStorage.removeItem(STORAGE_KEY);
+
+            } catch (storageError) {
+
+                console.error(
+                    "Unable to remove profile data from LocalStorage:",
+                    storageError
+                );
+
+            }
+
+
+            // Clear displayed profile information.
+
+            resetProfileUI();
+
+
+            // Redirect after successful Firebase sign-out.
+
+            window.location.replace(
+                "index.html"
+            );
+
+        }
+
+
+        // ======================================================================
+        // 22. PROFILE BACK BUTTON
+        // ======================================================================
+
+        if (backBtn) {
+
+            backBtn.addEventListener(
+                "click",
+                () => {
+
+                    window.location.href =
+                        "home.html";
+
+                }
+            );
+
+        }
+
+
+        // ======================================================================
+        // 23. VIEW RATES BACK BUTTON
+        // ======================================================================
+
+        if (ratesBackBtn) {
+
+            ratesBackBtn.addEventListener(
+                "click",
+                showProfileView
+            );
+
+        }
+
+
+        // ======================================================================
+        // 24. MENU NAVIGATION
+        // ======================================================================
+
+        const paymentHistoryBtn =
+            document.querySelector(
+                '[data-menu="Payment History"]'
+            );
+
+
+        const rateBtn =
+            document.querySelector(
+                '[data-menu="Rate"]'
+            );
+
+
+        const withdrawalBtn =
+            document.querySelector(
+                '[data-menu="Withdrawal"]'
+            );
+
+
+        // PAYMENT HISTORY
+
+        if (paymentHistoryBtn) {
+
+            paymentHistoryBtn.addEventListener(
+                "click",
+                () => {
+
+                    window.location.href =
+                        "history.html";
+
+                }
+            );
+
+        }
+
+
+        // RATE — switch to the View Rates interface in the same page.
+
+        if (rateBtn) {
+
+            rateBtn.addEventListener(
+                "click",
+                showRatesView
+            );
+
+        }
+
+
+        // WITHDRAWAL
+
+        if (withdrawalBtn) {
+
+            withdrawalBtn.addEventListener(
+                "click",
+                () => {
+
+                    window.location.href =
+                        "money_withdrawal.html";
+
+                }
+            );
+
+        }
+
+
+        // ======================================================================
+        // 25. LOGOUT BUTTON EVENT
+        // ======================================================================
+
+        if (logoutBtn) {
+
+            logoutBtn.addEventListener(
+                "click",
+                handleLogout
+            );
+
+        }
+
+
+        // ======================================================================
+        // 26. LOCALSTORAGE CROSS-TAB SYNCHRONIZATION
+        // ======================================================================
+
+        window.addEventListener(
+            "storage",
+            (event) => {
+
+                // Ignore storage updates while logout is running.
+
+                if (isLoggingOut) {
+                    return;
+                }
+
+
+                // Update profile only when the profile key changes.
+                // event.key === null means LocalStorage was cleared.
+
+                if (
+                    event.key === STORAGE_KEY ||
+                    event.key === null
+                ) {
+
+                    loadUserProfile();
+
+                }
+
+            }
+        );
+
+
+        // ======================================================================
+        // 27. INITIAL PROFILE LOAD
+        // ======================================================================
+
+        // Load profile immediately from LocalStorage.
+
+        loadUserProfile();
+
+
+        // ======================================================================
+        // 28. LOGOUT BUTTON INITIAL STATE
+        // ======================================================================
+
+        // The Logout button must be enabled immediately.
+        // Do not wait for Firebase Authentication initialization.
+
+        if (logoutBtn) {
+
+            logoutBtn.disabled = false;
+
+        }
+
+
+        // ======================================================================
+        // 29. INITIAL VIEW STATE
+        // ======================================================================
+
+        // The Profile view is the default view.
+        // The View Rates view stays hidden until the Rate button is pressed.
+
+        if (profileView && ratesView) {
+
+            profileView.hidden = false;
+            ratesView.hidden = true;
+
+        }
+
+    </script>
+
+</body>
+</html>

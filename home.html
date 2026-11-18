@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>App UI</title>
+
+    <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/home/resource-hud.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/home/profile-logo.css"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-image: url('picture_resource/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+
+            position: relative;
+
+            transition:
+                transform 0.5s ease-in-out,
+                opacity 0.5s ease-in-out;
+
+            will-change: transform, opacity;
+        }
+
+        body.page-transition {
+            transform: scale(1.08);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .play-btn {
+            display: flex;
+
+            background: none;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            filter: none;
+
+            padding: 0;
+            margin: 0;
+
+            cursor: default;
+
+            -webkit-tap-highlight-color: transparent;
+
+            transition:
+                transform 0.1s ease-out;
+
+            will-change: transform;
+        }
+
+        .play-btn.pressed {
+            transform: scale(0.95);
+        }
+
+        .play-btn img {
+            display: block;
+
+            background: none;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            filter: none;
+
+            padding: 0;
+            margin: 0;
+
+            width: auto;
+            height: auto;
+
+            max-width: 100%;
+
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ============================================================
+           Bottom Navigation
+           ============================================================ */
+
+        .bottom-nav {
+            width: 100%;
+
+            display: flex;
+
+            justify-content: space-around;
+            align-items: center;
+
+            padding:
+                5px 8px
+                calc(10px + env(safe-area-inset-bottom, 0px));
+
+            background:
+                rgba(22, 41, 63, 0.5);
+
+            border: none;
+            outline: none;
+            box-shadow: none;
+            filter: none;
+
+            margin-top: 12px;
+
+            gap: 4px;
+
+            pointer-events: auto;
+        }
+
+        .bottom-nav-btn {
+            flex: 1 1 0;
+
+            min-width: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 4px;
+
+            background: none;
+
+            border: none;
+            outline: none;
+            box-shadow: none;
+            filter: none;
+
+            padding: 0px 4px;
+            margin: 0;
+
+            cursor: default;
+
+            color: #ffffff;
+
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bottom-nav-btn .material-icons {
+            font-size: 35px;
+            line-height: 1;
+
+            color: #ffffff;
+
+            background: transparent;
+
+            border: none;
+            outline: none;
+            box-shadow: none;
+
+            filter:
+                drop-shadow(
+                    0 1px 2px rgba(0, 0, 0, 0.5)
+                );
+        }
+
+        .bottom-nav-label {
+            color: #ffffff;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            line-height: 1;
+
+            letter-spacing: 0.3px;
+
+            background: none;
+
+            border: none;
+            outline: none;
+            box-shadow: none;
+
+            filter:
+                drop-shadow(
+                    0 1px 2px rgba(0, 0, 0, 0.5)
+                );
+
+            white-space: nowrap;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ============================================================
+         Header Profile
+         ============================================================ -->
+
+    <div class="app-header-left">
+
+        <div
+            class="header-profile-btn"
+            id="headerProfileBtn"
+        >
+
+            <span class="material-icons">
+                account_circle
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         Coins HUD
+         ============================================================ -->
+
+    <div class="coins-hud">
+
+        <img
+            class="coins-hud-icon"
+            src="picture_resource/icon/coin.png"
+            alt="Coin"
+            draggable="false"
+        >
+
+        <div class="coins-hud-bar">
+
+            <span
+                class="coins-hud-value"
+                id="coinsHudValue"
+            >0</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         Diamond HUD
+         ============================================================ -->
+
+    <div class="diamond-hud">
+
+        <img
+            class="diamond-hud-icon"
+            src="picture_resource/icon/dimon.png"
+            alt="Diamond"
+            draggable="false"
+        >
+
+        <div class="diamond-hud-bar">
+
+            <span
+                class="diamond-hud-value"
+                id="diamondHudValue"
+            >0</span>
+
+        </div>
+
+        <button
+            class="diamond-add-btn"
+            type="button"
+            id="diamondAddBtn"
+            aria-label="Add Diamond"
+        >
+
+            <span class="material-icons">
+                add
+            </span>
+
+        </button>
+
+    </div>
+
+
+    <!-- ============================================================
+         Main Container
+         ============================================================ -->
+
+    <div class="app-container">
+
+        <button
+            class="play-btn"
+            type="button"
+        >
+
+            <img
+                src="picture_resource/icon/play_button.png"
+                alt=""
+            >
+
+        </button>
+
+
+        <!-- ========================================================
+             Bottom Navigation
+             ======================================================== -->
+
+        <nav class="bottom-nav">
+
+            <button
+                class="bottom-nav-btn"
+                type="button"
+                id="navShop"
+            >
+
+                <span class="material-icons">
+                    store
+                </span>
+
+                <span class="bottom-nav-label">
+                    Shop
+                </span>
+
+            </button>
+
+
+            <button
+                class="bottom-nav-btn"
+                type="button"
+                id="navProfile"
+            >
+
+                <span class="material-icons">
+                    account_circle
+                </span>
+
+                <span class="bottom-nav-label">
+                    Profile
+                </span>
+
+            </button>
+
+
+            <button
+                class="bottom-nav-btn"
+                type="button"
+                id="navSetting"
+            >
+
+                <span class="material-icons">
+                    settings
+                </span>
+
+                <span class="bottom-nav-label">
+                    Setting
+                </span>
+
+            </button>
+
+        </nav>
+
+    </div>
+
+
+    <!-- ============================================================
+         LocalStorage Integration
+         No Firebase / No Firestore
+         ============================================================ -->
+
+    <script type="module">
+
+        // ============================================================
+        // Profile Logo Module
+        // ============================================================
+
+        import {
+            updateProfileAvatar
+        } from "./js/home/profile-logo.js";
+
+
+        // ============================================================
+        // Configuration
+        // ============================================================
+
+        const USER_STORAGE_KEY =
+            "userDatakv9688658vs";
+
+
+        // ============================================================
+        // DOM References
+        // ============================================================
+
+        const coinsHudValue =
+            document.getElementById(
+                "coinsHudValue"
+            );
+
+
+        const diamondHudValue =
+            document.getElementById(
+                "diamondHudValue"
+            );
+
+
+        // ============================================================
+        // User Resource Variables
+        // ============================================================
+
+        let coin = 0;
+
+        let diamond = 0;
+
+
+        // ============================================================
+        // Safe LocalStorage Reader
+        //
+        // Only reads:
+        // name
+        // color
+        // profileUrl
+        // coin
+        // diamond
+        //
+        // Other properties remain untouched.
+        // ============================================================
+
+        function readUserData() {
+
+            try {
+
+                const storedValue =
+                    localStorage.getItem(
+                        USER_STORAGE_KEY
+                    );
+
+
+                if (
+                    storedValue === null
+                ) {
+
+                    return null;
+                }
+
+
+                const userData = JSON.parse(
+                    storedValue || "null"
+                );
+
+
+                if (
+                    userData === null ||
+                    typeof userData !== "object" ||
+                    Array.isArray(userData)
+                ) {
+
+                    return null;
+                }
+
+
+                return userData;
+
+            } catch (error) {
+
+                console.error(
+                    "LocalStorage user data reading error:",
+                    error
+                );
+
+                return null;
+            }
+        }
+
+
+        // ============================================================
+        // Safe String Validation
+        // ============================================================
+
+        function getSafeString(value) {
+
+            if (
+                typeof value !== "string"
+            ) {
+
+                return "";
+            }
+
+
+            return value.trim();
+        }
+
+
+        // ============================================================
+        // Safe Resource Validation
+        // ============================================================
+
+        function getSafeResource(value) {
+
+            if (
+                typeof value !== "number" ||
+                !Number.isFinite(value) ||
+                value < 0
+            ) {
+
+                return 0;
+            }
+
+
+            return value;
+        }
+
+
+        // ============================================================
+        // Number Formatter
+        // Original formatting behavior preserved.
+        // ============================================================
+
+        function formatResourceValue(value) {
+
+            if (
+                typeof value !== "number" ||
+                !Number.isFinite(value)
+            ) {
+
+                value = 0;
+            }
+
+
+            value = Math.max(0, value);
+
+
+            if (value <= 9999) {
+
+                return value.toString();
+            }
+
+
+            if (value >= 1000000) {
+
+                const million =
+                    value / 1000000;
+
+
+                const truncatedMillion =
+                    Math.floor(
+                        million * 10
+                    ) / 10;
+
+
+                const integerPart =
+                    Math.floor(
+                        truncatedMillion
+                    );
+
+
+                const decimalPart =
+                    Math.round(
+                        (
+                            truncatedMillion -
+                            integerPart
+                        ) * 10
+                    );
+
+
+                if (decimalPart === 0) {
+
+                    return (
+                        integerPart.toString() +
+                        "M"
+                    );
+                }
+
+
+                return (
+                    integerPart.toString() +
+                    "." +
+                    decimalPart.toString() +
+                    "M"
+                );
+            }
+
+
+            if (value >= 100000) {
+
+                const thousand =
+                    Math.floor(
+                        value / 1000
+                    );
+
+
+                return (
+                    thousand.toString() +
+                    "K"
+                );
+            }
+
+
+            if (value >= 10000) {
+
+                const tenThousand =
+                    value / 10000;
+
+
+                const truncatedK =
+                    Math.floor(
+                        tenThousand * 10
+                    ) / 10;
+
+
+                const integerPart =
+                    Math.floor(
+                        truncatedK
+                    );
+
+
+                const decimalPart =
+                    Math.round(
+                        (
+                            truncatedK -
+                            integerPart
+                        ) * 10
+                    );
+
+
+                if (decimalPart === 0) {
+
+                    return (
+                        integerPart.toString() +
+                        "K"
+                    );
+                }
+
+
+                return (
+                    integerPart.toString() +
+                    "." +
+                    decimalPart.toString() +
+                    "K"
+                );
+            }
+
+
+            return value.toString();
+        }
+
+
+        // ============================================================
+        // Render Coin HUD
+        // ============================================================
+
+        function renderCoinHud() {
+
+            if (!coinsHudValue) {
+                return;
+            }
+
+
+            coinsHudValue.textContent =
+                formatResourceValue(
+                    coin
+                );
+        }
+
+
+        // ============================================================
+        // Render Diamond HUD
+        // ============================================================
+
+        function renderDiamondHud() {
+
+            if (!diamondHudValue) {
+                return;
+            }
+
+
+            diamondHudValue.textContent =
+                formatResourceValue(
+                    diamond
+                );
+        }
+
+
+        // ============================================================
+        // Apply LocalStorage User Data
+        // ============================================================
+
+        function applyUserData(userData) {
+
+            if (
+                !userData ||
+                typeof userData !== "object" ||
+                Array.isArray(userData)
+            ) {
+
+                userData = {};
+            }
+
+
+            // --------------------------------------------------------
+            // Coin
+            // --------------------------------------------------------
+
+            coin =
+                getSafeResource(
+                    userData.coin
+                );
+
+
+            // --------------------------------------------------------
+            // Diamond
+            // --------------------------------------------------------
+
+            diamond =
+                getSafeResource(
+                    userData.diamond
+                );
+
+
+            // --------------------------------------------------------
+            // Profile Logo
+            // --------------------------------------------------------
+
+            updateProfileAvatar({
+
+                name:
+                    getSafeString(
+                        userData.name
+                    ),
+
+                photo:
+                    getSafeString(
+                        userData.profileUrl
+                    ),
+
+                color:
+                    getSafeString(
+                        userData.color
+                    )
+
+            });
+
+
+            // --------------------------------------------------------
+            // Update HUD
+            // --------------------------------------------------------
+
+            renderCoinHud();
+
+            renderDiamondHud();
+        }
+
+
+        // ============================================================
+        // Initialize User Data
+        // ============================================================
+
+        function initializeUserData() {
+
+            const userData =
+                readUserData();
+
+
+            applyUserData(
+                userData
+            );
+        }
+
+
+        // ============================================================
+        // Listen for LocalStorage Updates
+        //
+        // The storage event works when another document/tab
+        // updates the same LocalStorage key.
+        //
+        // Same-document updates do not trigger this event.
+        // ============================================================
+
+        window.addEventListener(
+            "storage",
+            function (event) {
+
+                if (
+                    event.key !== USER_STORAGE_KEY &&
+                    event.key !== null
+                ) {
+
+                    return;
+                }
+
+
+                initializeUserData();
+
+            }
+        );
+
+
+        // ============================================================
+        // Initial Data Loading
+        // ============================================================
+
+        initializeUserData();
+
+
+        // ============================================================
+        // Diamond Add Button
+        // ============================================================
+
+        (function () {
+
+            const diamondAddBtn =
+                document.getElementById(
+                    "diamondAddBtn"
+                );
+
+
+            if (!diamondAddBtn) {
+                return;
+            }
+
+
+            diamondAddBtn.addEventListener(
+                "click",
+                function () {
+
+                    window.location.href =
+                        "shop.html";
+                }
+            );
+
+        })();
+
+
+        // ============================================================
+        // Bottom Navigation
+        // ============================================================
+
+        (function () {
+
+            const navShop =
+                document.getElementById(
+                    "navShop"
+                );
+
+
+            if (navShop) {
+
+                navShop.addEventListener(
+                    "click",
+                    function () {
+
+                        window.location.href =
+                            "shop.html";
+                    }
+                );
+            }
+
+
+            const navProfile =
+                document.getElementById(
+                    "navProfile"
+                );
+
+
+            if (navProfile) {
+
+                navProfile.addEventListener(
+                    "click",
+                    function () {
+
+                        window.location.href =
+                            "profile.html";
+                    }
+                );
+            }
+
+
+            const navSetting =
+                document.getElementById(
+                    "navSetting"
+                );
+
+
+            if (navSetting) {
+
+                navSetting.addEventListener(
+                    "click",
+                    function () {
+
+                        window.location.href =
+                            "setting.html";
+                    }
+                );
+            }
+
+        })();
+
+
+        // ============================================================
+        // Play Button
+        // Original animation and transition preserved.
+        // ============================================================
+
+        (function () {
+
+            const playBtn =
+                document.querySelector(
+                    ".play-btn"
+                );
+
+
+            if (!playBtn) {
+                return;
+            }
+
+
+            let isNavigating =
+                false;
+
+
+            playBtn.addEventListener(
+                "click",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    if (isNavigating) {
+                        return;
+                    }
+
+
+                    isNavigating =
+                        true;
+
+
+                    playBtn.classList.add(
+                        "pressed"
+                    );
+
+
+                    setTimeout(
+                        function () {
+
+                            playBtn.classList.remove(
+                                "pressed"
+                            );
+
+
+                            document.body.classList.add(
+                                "page-transition"
+                            );
+
+
+                            setTimeout(
+                                function () {
+
+                                    window.location.href =
+                                        "game_screen.html";
+
+                                },
+                                500
+                            );
+
+                        },
+                        100
+                    );
+
+                }
+            );
+
+        })();
+
+    </script>
+
+</body>
+
+</html>

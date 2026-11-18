@@ -1,0 +1,3410 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#16293F" />
+<title>Shop — Archery Game</title>
+<link rel="stylesheet" href="css/shop/shop-filter.css">
+
+<style>
+:root{
+  --theme:#213C5E;
+  --theme-deep:#16293F;
+  --theme-deeper:#0F1E30;
+  --theme-soft:#2C4E76;
+  --theme-softer:#35597F;
+  --text:#F2F6FB;
+  --text-soft:#B6C6D9;
+  --text-dim:#7E93A9;
+  --gold:#FFC83D;
+  --gold-glow:rgba(255,200,61,.22);
+  --diamond:#5FD8FF;
+  --diamond-glow:rgba(95,216,255,.22);
+  --success:#3DDC84;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --header-h:64px
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html,
+body{
+  margin:0;padding:0;width:100%;height:100%;min-height:100%;overflow:hidden;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none
+}
+
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -10%,rgba(53,89,127,.35),transparent 60%),
+    radial-gradient(900px 400px at 10% 110%,rgba(33,60,94,.35),transparent 60%),
+    radial-gradient(1000px 600px at 100% 50%,rgba(44,78,118,.45),transparent 70%),
+    linear-gradient(180deg,var(--theme-deeper),var(--theme-deep))
+}
+
+.app-shell{
+  display:flex;flex-direction:column;height:100vh;height:100dvh;
+  width:100%;max-width:100vw;overflow:hidden
+}
+
+/* HEADER */
+
+.shop-header{
+  flex-shrink:0;z-index:100;
+  height:calc(var(--header-h) + env(safe-area-inset-top));
+  padding-top:env(safe-area-inset-top);
+  display:flex;align-items:center;
+  background:linear-gradient(180deg,var(--theme),var(--theme-deep));
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  box-shadow:0 6px 20px -12px rgba(0,0,0,.85);
+  padding-left:4px;padding-right:6px;gap:2px
+}
+
+.header-left{flex:0 0 auto;display:flex;align-items:center}
+
+.back-btn{
+  width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:none;border-radius:12px;color:var(--text);
+  cursor:pointer;transition:background .15s,transform .12s;flex-shrink:0;padding:0
+}
+
+.back-btn:active{background:rgba(255,255,255,.1);transform:scale(.94)}
+
+.back-btn svg{width:26px;height:26px}
+
+.header-right{
+  flex:1 1 auto;display:flex;align-items:center;justify-content:flex-end;gap:20px;min-width:0
+}
+
+.hud{position:relative;display:flex;align-items:center;height:44px;flex-shrink:0}
+
+.hud-icon,
+.hud-emoji{
+  position:relative;z-index:3;width:42px;height:42px;flex-shrink:0;object-fit:contain;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))
+}
+
+.hud-bar{
+  display:flex;align-items:center;justify-content:center;min-width:76px;height:32px;
+  padding:0 8px 0 14px;margin-left:-12px;background:var(--theme-deeper);
+  border:1px solid rgba(255,255,255,.08);border-radius:7px
+}
+
+.hud-value{
+  color:#fff;font-size:14px;font-weight:800;line-height:1;letter-spacing:.2px;
+  white-space:nowrap;font-variant-numeric:tabular-nums
+}
+
+.hud.pulse{animation:hudPulse .35s ease}
+
+@keyframes hudPulse{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.1)}
+  100%{transform:scale(1)}
+}
+
+/* SHOP LAYOUT */
+
+.shop-scroll{
+  flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scrollbar-width:none;
+  padding-bottom:calc(40px + env(safe-area-inset-bottom))
+}
+
+.shop-scroll::-webkit-scrollbar{display:none}
+
+.shop-main{padding:18px 14px 40px;max-width:720px;margin:0 auto;width:100%}
+
+.shop-section{margin-bottom:22px}
+
+/* SKIN CARD */
+
+.skin-scroll{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;width:100%;padding:2px 2px 8px;margin:0
+}
+
+.item-card{
+  position:relative;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--theme-soft),var(--theme));
+  border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);
+  padding:12px;overflow:hidden;transition:border-color .2s,transform .15s;
+  box-shadow:0 8px 20px -14px rgba(0,0,0,.85)
+}
+
+.item-card:active{transform:scale(.985)}
+
+.item-card.owned{border-color:rgba(61,220,132,.45)}
+
+.item-card.applied{
+  border-color:rgba(95,216,255,.55);
+  box-shadow:0 0 0 1px rgba(95,216,255,.15),0 8px 20px -14px rgba(0,0,0,.85)
+}
+
+.item-card::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent)
+}
+
+.item-img-wrap{
+  aspect-ratio:1/1;width:100%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%,rgba(53,89,127,.9),transparent 72%);
+  border-radius:var(--radius-md);margin-bottom:10px;overflow:hidden
+}
+
+.item-img{
+  width:100%;height:100%;object-fit:contain;image-rendering:-webkit-optimize-contrast;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.55))
+}
+
+.item-name{
+  font-size:14px;font-weight:700;line-height:1.25;margin:0 0 8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+
+.item-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+
+.buy-btn{
+  width:100%;border:none;border-radius:12px;padding:6px 10px;font-size:20px;font-weight:800;
+  letter-spacing:.4px;text-transform:uppercase;color:#14243A;
+  background:linear-gradient(180deg,#FFE27A,var(--gold));
+  box-shadow:0 6px 18px -8px var(--gold-glow),inset 0 1px 0 rgba(255,255,255,.45);
+  cursor:pointer;transition:transform .12s,filter .15s,opacity .2s;touch-action:manipulation;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px
+}
+
+.buy-btn.diamond-buy{
+  background:linear-gradient(180deg,#A0ECFF,var(--diamond));
+  box-shadow:0 6px 18px -8px var(--diamond-glow),inset 0 1px 0 rgba(255,255,255,.45)
+}
+
+.buy-btn:active:not(:disabled){transform:scale(.96);filter:brightness(1.05)}
+
+.buy-btn:disabled{
+  cursor:not-allowed;opacity:.6;color:var(--text-soft);
+  background:var(--theme-deeper);box-shadow:none
+}
+
+.buy-btn.apply-btn{
+  background:rgba(95,216,255,.16);color:var(--diamond);box-shadow:none;
+  border:1px solid rgba(95,216,255,.42)
+}
+
+.buy-btn.applied-btn{
+  background:rgba(95,216,255,.24);color:#EAF9FF;box-shadow:none;
+  border:1px solid rgba(95,216,255,.65);cursor:default;opacity:1
+}
+
+.buy-btn .btn-price-icon{
+  width:30px;height:30px;display:inline-block;flex-shrink:0;vertical-align:middle
+}
+
+.buy-btn.is-loading{pointer-events:none;cursor:wait;opacity:.78}
+
+.btn-spinner{
+  width:20px;height:20px;flex:0 0 16px;
+  border:2px solid rgba(255,255,255,.28);border-top-color:currentColor;
+  border-radius:50%;animation:btnSpin .65s linear infinite;display:block
+}
+
+@keyframes btnSpin{to{transform:rotate(360deg)}}
+
+/* POWER CARD */
+
+.power-grid{display:grid;grid-template-columns:1fr;gap:12px}
+
+.power-card{
+  position:relative;display:flex;flex-direction:row;align-items:stretch;gap:10px;
+  width:100%;min-width:0;
+  height:70px !important;min-height:70px !important;max-height:70px !important;
+  box-sizing:border-box !important;padding:8px 10px;
+  background:linear-gradient(180deg,var(--theme-soft),var(--theme));
+  border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);
+  overflow:hidden !important;flex-shrink:0;
+  box-shadow:0 8px 20px -14px rgba(0,0,0,.85);
+  transition:border-color .2s,transform .15s
+}
+
+.power-card:active{transform:scaleX(.985)}
+
+.power-card::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+  pointer-events:none
+}
+
+.power-card-image-wrap{
+  flex:0 0 auto;width:17%;max-width:84px;min-width:55px;display:flex;
+  align-items:center;justify-content:center;align-self:stretch;
+  background:radial-gradient(circle at 50% 40%,rgba(53,89,127,.9),transparent 72%);
+  border-radius:var(--radius-md);overflow:hidden
+}
+
+.power-card-image{
+  width:78%;height:78%;object-fit:contain;image-rendering:-webkit-optimize-contrast;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.55))
+}
+
+.power-card-fallback{font-size:30px;line-height:1}
+
+.power-card-content{
+  flex:1 1 auto;min-width:0;min-height:0;display:flex;flex-direction:column;
+  justify-content:center;gap:1px;overflow:hidden
+}
+
+.power-card-name-row{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-width:0;min-height:0;overflow:hidden
+}
+
+.power-card-name{
+  flex:1 1 auto;min-width:0;margin:0;font-size:15px;font-weight:700;line-height:1.2;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+
+.power-card-counter{
+  flex:0 0 auto;font-size:18px;font-weight:800;letter-spacing:.2px;color:var(--text-soft);
+  background:rgba(15,30,48,.55);border:1px solid rgba(255,255,255,.1);border-radius:7px;
+  padding:2px 7px;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.2
+}
+
+.power-card-counter.is-full{
+  color:#0F1E30;background:linear-gradient(180deg,#8ADFFF,#64D2FA);
+  border-color:rgba(100,210,250,.8);box-shadow:0 2px 8px -3px rgba(100,210,250,.55)
+}
+
+.power-card-action{
+  flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;
+  align-items:stretch;width:84px;min-height:0;overflow:hidden
+}
+
+.power-card-button{
+  width:100%;min-height:36px;max-height:100%;padding:8px 6px;border:none;border-radius:10px;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;color:#14243A;
+  background:linear-gradient(180deg,#A0ECFF,var(--diamond));
+  box-shadow:0 6px 18px -8px var(--diamond-glow),inset 0 1px 0 rgba(255,255,255,.45);
+  font-size:15px;font-weight:800;letter-spacing:.3px;cursor:pointer;touch-action:manipulation;
+  transition:transform .12s,filter .15s,opacity .2s
+}
+
+.power-card-button:active:not(:disabled){transform:scale(.96);filter:brightness(1.05)}
+
+.power-card-button:focus-visible{outline:2px solid var(--diamond);outline-offset:3px}
+
+.power-card-button:disabled{
+  cursor:not-allowed;opacity:.6;color:var(--text-soft);
+  background:var(--theme-deeper);box-shadow:none
+}
+
+.power-card-button.is-loading{pointer-events:none;cursor:wait;opacity:.78}
+
+.power-card-price-icon{
+  width:25px;height:25px;display:inline-block;flex:0 0 20px;object-fit:contain
+}
+
+.power-card-spinner{
+  width:16px;height:16px;flex:0 0 16px;
+  border:2px solid rgba(255,255,255,.28);border-top-color:var(--diamond);
+  border-radius:50%;animation:btnSpin .65s linear infinite
+}
+
+/* DIAMOND CARD */
+
+.shop-grid{display:grid;grid-template-columns:1fr;gap:12px}
+
+.diamond-card{
+  position:relative;display:grid;
+  grid-template-columns:clamp(84px,28%,120px) minmax(0,1fr);
+  grid-template-rows:1fr auto;column-gap:14px;row-gap:6px;align-items:stretch;
+  width:100%;min-width:0;min-height:112px;padding:12px 14px;
+  background:linear-gradient(180deg,var(--theme-soft),var(--theme));
+  border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);overflow:hidden;
+  box-shadow:0 8px 20px -14px rgba(0,0,0,.85);
+  transition:border-color .2s,transform .15s
+}
+
+.diamond-card:active{transform:scale(.985)}
+
+.diamond-card::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+  pointer-events:none
+}
+
+.diamond-card-image-wrap{
+  grid-column:1;grid-row:1 / span 2;width:100%;min-width:0;min-height:0;max-width:none;
+  align-self:stretch;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;box-shadow:none;border-radius:0;overflow:visible
+}
+
+.diamond-card-image{
+  display:block;width:100%;height:100%;max-width:100%;max-height:100%;
+  object-fit:contain;object-position:center;background:none;border:none;box-shadow:none;
+  border-radius:0;filter:none;margin:0;padding:0;flex-shrink:0
+}
+
+.diamond-card-image.is-failed{visibility:hidden}
+
+.diamond-card-content{
+  grid-column:2;grid-row:1;align-self:center;justify-content:center;min-width:0;
+  display:flex;flex-direction:column;gap:3px;overflow:hidden
+}
+
+.diamond-card-amount{
+  margin:0;padding:0;color:#fff;font-size:16px;font-weight:800;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+
+.diamond-card-label{color:var(--text-soft);font-size:10px;font-weight:600;line-height:1.2}
+
+.diamond-card-action{
+  grid-column:2;grid-row:2;justify-self:end;align-self:end;width:96px;max-width:100%;
+  display:flex;justify-content:flex-end;align-items:stretch
+}
+
+.diamond-card-button{
+  width:100%;min-height:36px;padding:2px 6px;border:none;border-radius:10px;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;color:#14243A;
+  background:linear-gradient(180deg,#FFE27A,var(--gold));
+  box-shadow:0 6px 18px -8px var(--gold-glow),inset 0 1px 0 rgba(255,255,255,.45);
+  font-size:18px;font-weight:800;letter-spacing:.3px;cursor:pointer;touch-action:manipulation;
+  transition:transform .12s,filter .15s,opacity .2s
+}
+
+.diamond-card-button:active:not(:disabled){transform:scale(.96);filter:brightness(1.05)}
+
+.diamond-card-button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+.diamond-card-button:disabled{
+  cursor:not-allowed;opacity:.6;color:var(--text-soft);
+  background:var(--theme-deeper);box-shadow:none
+}
+
+.diamond-card-button.is-loading{pointer-events:none;cursor:wait;opacity:.78}
+
+.diamond-card-price-icon{
+  width:35px;height:35px;display:inline-block;flex:0 0 20px;object-fit:contain
+}
+
+.diamond-card-spinner{
+  width:20px;height:20px;flex:0 0 16px;
+  border:2px solid rgba(255,255,255,.28);border-top-color:var(--gold);
+  border-radius:50%;animation:btnSpin .65s linear infinite
+}
+
+/* PURCHASE BUTTONS THAT ARE NOT CURRENTLY ALLOWED
+   They keep their normal look: restriction uses aria-disabled
+   (no native "disabled"), enforced in JavaScript. Nothing is
+   greyed, faded or recoloured. */
+
+.buy-btn[aria-disabled="true"],
+.power-card-button[aria-disabled="true"],
+.diamond-card-button[aria-disabled="true"]{
+  cursor:pointer
+}
+
+/* LOADING */
+
+.shop-loading{
+  display:flex;align-items:center;justify-content:center;padding:60px 0;
+  color:var(--text-soft);font-size:13px;letter-spacing:.5px
+}
+
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(255,255,255,.18);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-right:10px
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.hidden{display:none!important}
+</style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+<header class="shop-header">
+
+  <div class="header-left">
+    <button class="back-btn" id="backBtn" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <div class="header-right">
+
+    <div class="hud" id="coinsHud" aria-live="polite">
+      <img class="hud-icon" id="coinIcon" src="picture_resource/icon/coin.png" alt="Coins"
+      onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'●',className:'hud-emoji',style:'color:#FFC83D;font-size:16px'}))" />
+
+      <div class="hud-bar">
+        <span class="hud-value" id="coinsValue">—</span>
+      </div>
+    </div>
+
+    <div class="hud" id="diamondsHud" aria-live="polite">
+      <img class="hud-icon" id="diamondIcon" src="picture_resource/icon/dimon.png" alt="Diamonds"
+      onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'◆',className:'hud-emoji',style:'color:#5FD8FF;font-size:16px'}))" />
+
+      <div class="hud-bar">
+        <span class="hud-value" id="diamondsValue">—</span>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<nav class="shop-filter" aria-label="Shop filters">
+  <button class="filter-btn active" data-filter="power">Power</button>
+  <button class="filter-btn" data-filter="skin">Skin</button>
+  <button class="filter-btn" data-filter="diamond">Diamond</button>
+</nav>
+
+<div class="shop-scroll" id="shopScroll">
+
+  <main class="shop-main">
+
+    <section class="shop-section" id="powersSection">
+      <div class="power-grid" id="powerGrid"></div>
+    </section>
+
+    <section class="shop-section" id="skinsSection">
+      <div class="skin-scroll" id="skinScroll"></div>
+    </section>
+
+    <section class="shop-section" id="diamondsSection">
+
+      <div id="shopLoading" class="shop-loading">
+        <div class="spinner"></div>
+        Loading shop…
+      </div>
+
+      <div id="shopGrid" class="shop-grid"></div>
+
+    </section>
+
+  </main>
+
+</div>
+</div>
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE IMPORTS
+   ========================================================= */
+
+import {
+  auth,
+  db
+} from "./firebase.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+/* =========================================================
+   CONSTANTS
+   ========================================================= */
+
+/*
+  All Shop user data uses this exact Local Storage key.
+*/
+
+const LS_KEY = "userDatakv9688658vs";
+
+const POWER_MAX = 1000;
+
+
+/* =========================================================
+   BACKEND API
+   ========================================================= */
+
+const API_BASE_URL =
+  "https://my-life-backend-3.onrender.com";
+
+const DIAMOND_PURCHASE_URL =
+  API_BASE_URL + "/api/diamond/purchase";
+
+const POWER_PURCHASE_URL =
+  API_BASE_URL + "/api/power/purchase";
+
+const SKIN_PURCHASE_URL =
+  API_BASE_URL + "/api/skin/purchase";
+
+const SKIN_APPLY_URL =
+  API_BASE_URL + "/api/skin/apply";
+
+
+/* =========================================================
+   BUSY STATES
+   ========================================================= */
+
+let powerPurchaseBusy = false;
+
+let diamondPurchaseBusy = false;
+
+/*
+  Purchase and Apply share one lock.
+  This prevents simultaneous Skin operations.
+*/
+
+let skinPurchaseBusy = false;
+
+let firebaseUser = null;
+
+/* =========================================================
+   POWER DATA
+   ========================================================= */
+
+const POWERS = [
+
+  {
+    id:"power_1",
+    name:"Reset",
+    firestoreField:"reset",
+    icon:"picture_resource/icon/reset.png",
+    emoji:"🔄",
+    price:{
+      amount:50,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"power_2",
+    name:"Idea",
+    firestoreField:"idea",
+    icon:"picture_resource/icon/idea_icon.png",
+    emoji:"💡",
+    price:{
+      amount:50,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"power_3",
+    name:"Replay",
+    firestoreField:"replay",
+    icon:"picture_resource/icon/replay.png",
+    emoji:"🔁",
+    price:{
+      amount:50,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"power_4",
+    name:"Preview",
+    firestoreField:"preview",
+    icon:"picture_resource/icon/on_view.png",
+    emoji:"👁️",
+    price:{
+      amount:50,
+      currency:"diamonds"
+    }
+  }
+
+];
+
+
+/* =========================================================
+   SKIN DATA
+   ========================================================= */
+
+const SKINS = [
+
+  {
+    id:"skin_1",
+    name:"Jungle Book",
+    icon:"picture_resource/game_picture/1.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"skin_2",
+    name:"Horse Garden",
+    icon:"picture_resource/game_picture/2.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"skin_3",
+    name:"Lion Cub",
+    icon:"picture_resource/game_picture/3.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"skin_4",
+    name:"Baby Cow",
+    icon:"picture_resource/game_picture/4.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"skin_5",
+    name:"Jungle Friend",
+    icon:"picture_resource/game_picture/5.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  },
+
+  {
+    id:"skin_6",
+    name:"Elephant Garden",
+    icon:"picture_resource/game_picture/6.jpg",
+    emoji:"🎯",
+    price:{
+      amount:500,
+      currency:"diamonds"
+    }
+  }
+
+];
+
+
+/* =========================================================
+   DIAMOND OFFERS
+   ========================================================= */
+
+const DIAMOND_OFFERS = [
+
+  {
+    id:"dia_10",
+    diamonds:10,
+    coins:1,
+    image:"picture_resource/dimon/dimon_1.png"
+  },
+
+  {
+    id:"dia_60",
+    diamonds:60,
+    coins:5,
+    image:"picture_resource/dimon/dimon_2.png"
+  },
+
+  {
+    id:"dia_130",
+    diamonds:130,
+    coins:10,
+    image:"picture_resource/dimon/dimon_3.png"
+  },
+
+  {
+    id:"dia_350",
+    diamonds:350,
+    coins:25,
+    image:"picture_resource/dimon/dimon_4.png"
+  },
+
+  {
+    id:"dia_750",
+    diamonds:750,
+    coins:50,
+    image:"picture_resource/dimon/dimon_5.png"
+  }
+
+];
+
+
+/* =========================================================
+   DATA VALIDATION HELPERS
+   ========================================================= */
+
+function isPlainObject(value){
+
+  return(
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value)
+  );
+}
+
+
+function isValidNumber(value){
+
+  return(
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= 0
+  );
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+/*
+  Read existing user data without destroying
+  previously cached fields.
+*/
+
+function getUserData(){
+
+  try{
+
+    const raw = localStorage.getItem(LS_KEY);
+
+    if(!raw){
+      return null;
+    }
+
+    const parsed = JSON.parse(raw);
+
+    if(!isPlainObject(parsed)){
+      return null;
+    }
+
+    return parsed;
+
+  }catch(error){
+
+    console.warn(
+      "Failed to read Shop Local Storage:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+/*
+  Save only through the exact required key.
+*/
+
+function saveUserData(data){
+
+  if(!isPlainObject(data)){
+    return false;
+  }
+
+  try{
+
+    localStorage.setItem(
+      LS_KEY,
+      JSON.stringify(data)
+    );
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Failed to save Shop Local Storage:",
+      error
+    );
+
+    return false;
+  }
+}
+
+
+/*
+  Merge user data instead of replacing the entire object.
+
+  Existing coin, diamond, power and unrelated fields
+  remain untouched unless explicitly updated.
+*/
+
+function mergeUserData(updates){
+
+  if(!isPlainObject(updates)){
+    return false;
+  }
+
+  const existing = getUserData() || {};
+
+  const merged = {
+    ...existing,
+    ...updates
+  };
+
+  return saveUserData(merged);
+}
+
+
+/* =========================================================
+   POWER NORMALIZATION
+   ========================================================= */
+
+function createDefaultPowerInventory(){
+
+  return{
+    reset:0,
+    idea:0,
+    replay:0,
+    preview:0
+  };
+}
+
+
+function normalizePowerInventory(raw){
+
+  const out = createDefaultPowerInventory();
+
+  if(!isPlainObject(raw)){
+    return out;
+  }
+
+  POWERS.forEach(function(power){
+
+    const field = power.firestoreField;
+
+    let value = Number(raw[field]);
+
+    if(
+      !Number.isFinite(value) ||
+      value < 0
+    ){
+
+      value = 0;
+    }
+
+    value = Math.floor(value);
+
+    if(value > POWER_MAX){
+      value = POWER_MAX;
+    }
+
+    out[field] = value;
+
+  });
+
+  return out;
+}
+
+
+function savePowerInventoryToLocalStorage(power){
+
+  if(!isPlainObject(power)){
+    return false;
+  }
+
+  return mergeUserData({
+    power:normalizePowerInventory(power)
+  });
+}
+
+
+/* =========================================================
+   CURRENCY HELPERS
+   ========================================================= */
+
+function syncCurrencyToLocalStorage(
+  coinValue,
+  diamondValue
+){
+
+  const updates = {};
+
+  if(isValidNumber(coinValue)){
+    updates.coin = coinValue;
+  }
+
+  if(isValidNumber(diamondValue)){
+    updates.diamond = diamondValue;
+  }
+
+  if(!Object.keys(updates).length){
+    return false;
+  }
+
+  return mergeUserData(updates);
+}
+
+
+function getLocalCoin(){
+
+  const data = getUserData() || {};
+
+  return isValidNumber(data.coin)
+    ? data.coin
+    : 0;
+}
+
+
+function getLocalDiamond(){
+
+  const data = getUserData() || {};
+
+  return isValidNumber(data.diamond)
+    ? data.diamond
+    : 0;
+}
+
+
+/* =========================================================
+   SKIN NORMALIZATION
+   ========================================================= */
+
+/*
+  Preserve the original application status conventions:
+
+  owned   = purchased Skin
+  applied = currently applied Skin
+
+  Unknown Skin names and unknown statuses are ignored.
+*/
+
+function normalizeSkinState(raw){
+
+  const out = {};
+
+  if(!isPlainObject(raw)){
+    return null;
+  }
+
+  SKINS.forEach(function(skin){
+
+    const value = raw[skin.name];
+
+    if(
+      value === "owned" ||
+      value === "applied"
+    ){
+
+      out[skin.name] = value;
+    }
+
+  });
+
+
+  /*
+    Only one Skin may remain applied.
+    Preserve the first valid applied Skin.
+  */
+
+  let appliedName = null;
+
+  Object.keys(out).forEach(function(name){
+
+    if(out[name] === "applied"){
+
+      if(appliedName === null){
+
+        appliedName = name;
+
+      }else{
+
+        out[name] = "owned";
+      }
+    }
+
+  });
+
+  return out;
+}
+
+
+/* =========================================================
+   INITIAL CACHED SKIN STATE
+   ========================================================= */
+
+/*
+  IMPORTANT:
+
+  Skin data is loaded from Local Storage immediately.
+  Firebase is not required to render the initial Shop UI.
+*/
+
+let userData = getUserData() || {};
+
+let skinState = normalizeSkinState(
+  userData.skin
+) || {};
+
+
+let coin = getLocalCoin();
+
+let diamond = getLocalDiamond();
+
+
+/* =========================================================
+   APPLIED SKIN IMAGE
+   ========================================================= */
+
+function getAppliedSkinImage(){
+
+  const data = getUserData();
+
+  if(
+    !data ||
+    typeof data.picture !== "string"
+  ){
+
+    return null;
+  }
+
+  return data.picture;
+}
+
+
+function syncAppliedSkinToLocalStorage(){
+
+  const appliedName = Object.keys(skinState).find(
+    function(name){
+
+      return skinState[name] === "applied";
+
+    }
+  );
+
+  if(!appliedName){
+
+    return mergeUserData({
+      picture:null
+    });
+  }
+
+  const skin = SKINS.find(function(item){
+
+    return item.name === appliedName;
+
+  });
+
+  if(!skin){
+    return false;
+  }
+
+  return mergeUserData({
+    picture:skin.icon
+  });
+}
+
+
+/* =========================================================
+   SKIN LOCAL CACHE UPDATE
+   ========================================================= */
+
+/*
+  This function is called only after receiving
+  valid Skin data from Firestore.
+
+  It does not modify coin, diamond or power.
+*/
+
+function saveSkinStateToLocalStorage(rawSkin){
+
+  const normalized = normalizeSkinState(rawSkin);
+
+  if(normalized === null){
+
+    console.warn(
+      "Invalid Skin data. Existing cache preserved."
+    );
+
+    return false;
+  }
+
+  skinState = normalized;
+
+  const appliedName = Object.keys(normalized).find(
+    function(name){
+
+      return normalized[name] === "applied";
+
+    }
+  );
+
+  const updates = {
+    skin:normalized
+  };
+
+  if(appliedName){
+
+    const appliedSkin = SKINS.find(function(skin){
+
+      return skin.name === appliedName;
+
+    });
+
+    if(appliedSkin){
+
+      updates.picture = appliedSkin.icon;
+    }
+
+  }else{
+
+    updates.picture = null;
+  }
+
+  const saved = mergeUserData(updates);
+
+  if(!saved){
+    return false;
+  }
+
+  return true;
+}
+
+
+/* =========================================================
+   SKIN HELPERS
+   ========================================================= */
+
+function getSkinStatus(skinName){
+
+  return skinState[skinName] || null;
+}
+
+
+function ownsSkin(skinId){
+
+  const skin = SKINS.find(function(item){
+
+    return item.id === skinId;
+
+  });
+
+  if(!skin){
+    return false;
+  }
+
+  const status = getSkinStatus(skin.name);
+
+  return(
+    status === "owned" ||
+    status === "applied"
+  );
+}
+
+
+/* =========================================================
+   POWER HELPERS
+   ========================================================= */
+
+function getLocalPowerInventory(){
+
+  const data = getUserData() || {};
+
+  return normalizePowerInventory(data.power);
+}
+
+
+function getPowerQtyByField(firestoreField){
+
+  const inventory = getLocalPowerInventory();
+
+  const value = Number(inventory[firestoreField]);
+
+  if(
+    !Number.isFinite(value) ||
+    value < 0
+  ){
+
+    return 0;
+  }
+
+  return Math.min(
+    POWER_MAX,
+    Math.floor(value)
+  );
+}
+
+
+function getPowerQty(powerId){
+
+  const power = POWERS.find(function(item){
+
+    return item.id === powerId;
+
+  });
+
+  if(!power){
+    return 0;
+  }
+
+  return getPowerQtyByField(power.firestoreField);
+}
+
+
+/* =========================================================
+   FORMATTERS
+   ========================================================= */
+
+function formatCoinValue(value){
+
+  let n = Number(value);
+
+  if(
+    !Number.isFinite(n) ||
+    n < 0
+  ){
+
+    n = 0;
+  }
+
+  n = Math.floor(n);
+
+  if(n >= 1e9){
+
+    const b = n / 1e9;
+
+    return[
+      b.toFixed(b % 1 === 0 ? 0 : 1),
+      "B"
+    ];
+  }
+
+  if(n >= 1e6){
+
+    const m = n / 1e6;
+
+    return[
+      m.toFixed(m % 1 === 0 ? 0 : 1),
+      "M"
+    ];
+  }
+
+  if(n >= 1e3){
+
+    const k = n / 1e3;
+
+    return[
+      k.toFixed(k % 1 === 0 ? 0 : 1),
+      "K"
+    ];
+  }
+
+  return[String(n)];
+}
+
+
+function fmt(n){
+
+  n = Number(n) || 0;
+
+  if(n >= 1e6){
+
+    return(
+      n / 1e6
+    ).toFixed(
+      n % 1e6 === 0 ? 0 : 1
+    ) + "M";
+  }
+
+  if(n >= 1e4){
+
+    return(
+      n / 1e3
+    ).toFixed(
+      n % 1e3 === 0 ? 0 : 1
+    ) + "K";
+  }
+
+  return n.toLocaleString();
+}
+
+
+/* =========================================================
+   HUD
+   ========================================================= */
+
+const coinsValueEl =
+  document.getElementById("coinsValue");
+
+const diamondsValueEl =
+  document.getElementById("diamondsValue");
+
+const coinsHud =
+  document.getElementById("coinsHud");
+
+const diamondsHud =
+  document.getElementById("diamondsHud");
+
+
+function pulse(el){
+
+  if(!el){
+    return;
+  }
+
+  el.classList.remove("pulse");
+
+  void el.offsetWidth;
+
+  el.classList.add("pulse");
+}
+
+
+function renderCoinHud(){
+
+  if(!coinsValueEl){
+    return;
+  }
+
+  coinsValueEl.textContent =
+    formatCoinValue(coin).join("");
+}
+
+
+function renderDiamondHud(){
+
+  if(!diamondsValueEl){
+    return;
+  }
+
+  diamondsValueEl.textContent =
+    formatCoinValue(diamond).join("");
+}
+
+
+/* =========================================================
+   CURRENCY REFRESH
+   ========================================================= */
+
+function refreshUserCurrency(){
+
+  userData = getUserData() || {};
+
+  coin = getLocalCoin();
+
+  diamond = getLocalDiamond();
+
+  renderCoinHud();
+
+  renderDiamondHud();
+
+  refreshAffordability();
+}
+
+
+/* =========================================================
+   FIRESTORE REFERENCES
+   ========================================================= */
+
+function userDocRef(uid){
+
+  return doc(
+    db,
+    "users",
+    uid
+  );
+}
+
+
+function userPowerDocRef(uid){
+
+  return doc(
+    db,
+    "users",
+    uid,
+    "power",
+    "power4"
+  );
+}
+
+
+/* =========================================================
+   FIRESTORE USER DOCUMENT READ
+   ========================================================= */
+
+/*
+  A failed Firestore read returns null.
+
+  A missing user document is NOT converted into
+  an empty Skin object.
+
+  Missing Skin field is NOT treated as empty Skin data.
+*/
+
+async function readUserDocument(user){
+
+  if(
+    !user ||
+    !user.uid
+  ){
+
+    return null;
+  }
+
+  try{
+
+    const snap = await getDoc(
+      userDocRef(user.uid)
+    );
+
+    if(!snap.exists()){
+
+      return{
+        exists:false,
+        valid:false
+      };
+    }
+
+    const data = snap.data() || {};
+
+    const result = {
+      exists:true,
+      valid:true,
+      coin:null,
+      diamond:null,
+      skin:null,
+      skinAvailable:false
+    };
+
+
+    if(isValidNumber(data.coin)){
+
+      result.coin = data.coin;
+    }
+
+
+    if(isValidNumber(data.diamond)){
+
+      result.diamond = data.diamond;
+    }
+
+
+    /*
+      Only accept Skin data if the actual Firestore
+      document contains a valid Skin object.
+    */
+
+    if(
+      Object.prototype.hasOwnProperty.call(
+        data,
+        "skin"
+      ) &&
+      isPlainObject(data.skin)
+    ){
+
+      const normalized = normalizeSkinState(data.skin);
+
+      if(normalized !== null){
+
+        result.skin = normalized;
+
+        result.skinAvailable = true;
+      }
+    }
+
+    return result;
+
+  }catch(error){
+
+    console.error(
+      "Failed to read Firestore user document:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+/* =========================================================
+   FIRESTORE POWER DOCUMENT READ
+   ========================================================= */
+
+async function readPowerDocument(user){
+
+  if(
+    !user ||
+    !user.uid
+  ){
+
+    return null;
+  }
+
+  try{
+
+    const powerRef = userPowerDocRef(user.uid);
+
+    const powerSnap = await getDoc(powerRef);
+
+    /*
+      Missing Power document:
+      Preserve existing cached Power data.
+    */
+
+    if(!powerSnap.exists()){
+
+      return null;
+    }
+
+    const data = powerSnap.data() || {};
+
+    const rawPower = data.power;
+
+    if(!isPlainObject(rawPower)){
+
+      console.warn(
+        "Invalid Power data in Firestore."
+      );
+
+      return null;
+    }
+
+    return normalizePowerInventory(rawPower);
+
+  }catch(error){
+
+    console.error(
+      "Failed to read Firestore Power document:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+/* =========================================================
+   FIREBASE USER DATA SYNCHRONIZATION
+   ========================================================= */
+
+/*
+  All reads are completed before applying updates.
+
+  Failed reads do not erase cached data.
+
+  Missing Skin data does not erase cached Skin data.
+
+  Existing unrelated Local Storage fields are preserved.
+*/
+
+async function loadUserStateFromFirebase(user){
+
+  if(
+    !user ||
+    !user.uid
+  ){
+
+    return false;
+  }
+
+  try{
+
+    const results = await Promise.all([
+
+      readUserDocument(user),
+
+      readPowerDocument(user)
+
+    ]);
+
+    const userState = results[0];
+
+    const powerState = results[1];
+
+    /*
+      A failed or missing user document must not
+      overwrite the current Local Storage data.
+    */
+
+    if(
+      !userState ||
+      userState.exists !== true ||
+      userState.valid !== true
+    ){
+
+      return false;
+    }
+
+    const updates = {};
+
+
+    /*
+      Synchronize only valid currency values.
+    */
+
+    if(isValidNumber(userState.coin)){
+
+      updates.coin = userState.coin;
+    }
+
+    if(isValidNumber(userState.diamond)){
+
+      updates.diamond = userState.diamond;
+    }
+
+
+    /*
+      Synchronize Skin only when Firestore actually
+      contains a valid Skin object.
+    */
+
+    if(
+      userState.skinAvailable === true &&
+      isPlainObject(userState.skin)
+    ){
+
+      updates.skin = userState.skin;
+
+      const appliedName = Object.keys(
+        userState.skin
+      ).find(function(name){
+
+        return userState.skin[name] === "applied";
+
+      });
+
+      if(appliedName){
+
+        const appliedSkin = SKINS.find(function(skin){
+
+          return skin.name === appliedName;
+
+        });
+
+        if(appliedSkin){
+
+          updates.picture = appliedSkin.icon;
+        }
+
+      }else{
+
+        updates.picture = null;
+      }
+    }
+
+
+    /*
+      Update Power only if its Firestore read
+      succeeded and returned valid data.
+    */
+
+    if(isPlainObject(powerState)){
+
+      updates.power = powerState;
+    }
+
+
+    /*
+      Save the complete set of validated updates
+      in one Local Storage operation.
+    */
+
+    if(Object.keys(updates).length){
+
+      const saved = mergeUserData(updates);
+
+      if(!saved){
+        return false;
+      }
+    }
+
+
+    /*
+      Refresh in-memory Skin state from the cache.
+    */
+
+    const cached = getUserData() || {};
+
+    skinState = normalizeSkinState(
+      cached.skin
+    ) || {};
+
+
+    refreshUserCurrency();
+
+    renderPowers();
+
+    renderSkins();
+
+    renderDiamonds();
+
+    refreshAffordability();
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Firebase synchronization failed:",
+      error
+    );
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   POST-SKIN-OPERATION FIRESTORE SYNCHRONIZATION
+   ========================================================= */
+
+/*
+  This function is specifically used after successful
+  Skin Purchase or Skin Apply backend confirmation.
+
+  It reads the existing users/{uid} document.
+
+  Local Storage is updated only when:
+  1. The document exists.
+  2. The Firestore read succeeds.
+  3. The Skin field exists.
+  4. The Skin field is a valid object.
+
+  If any condition fails, the previous cache remains.
+*/
+
+async function synchronizeSkinAfterBackend(user){
+
+  if(
+    !user ||
+    !user.uid
+  ){
+
+    return false;
+  }
+
+  const userState = await readUserDocument(user);
+
+  if(
+    !userState ||
+    userState.exists !== true ||
+    userState.valid !== true ||
+    userState.skinAvailable !== true ||
+    !isPlainObject(userState.skin)
+  ){
+
+    console.warn(
+      "Skin synchronization skipped. Existing cache preserved."
+    );
+
+    return false;
+  }
+
+
+  /*
+    Build one validated update.
+
+    Preserve unrelated cached values.
+  */
+
+  const updates = {
+    skin:userState.skin
+  };
+
+  if(isValidNumber(userState.coin)){
+
+    updates.coin = userState.coin;
+  }
+
+  if(isValidNumber(userState.diamond)){
+
+    updates.diamond = userState.diamond;
+  }
+
+
+  const appliedName = Object.keys(
+    userState.skin
+  ).find(function(name){
+
+    return userState.skin[name] === "applied";
+
+  });
+
+
+  if(appliedName){
+
+    const appliedSkin = SKINS.find(function(skin){
+
+      return skin.name === appliedName;
+
+    });
+
+    if(appliedSkin){
+
+      updates.picture = appliedSkin.icon;
+    }
+
+  }else{
+
+    updates.picture = null;
+  }
+
+
+  const saved = mergeUserData(updates);
+
+  if(!saved){
+
+    console.error(
+      "Failed to save synchronized Skin data."
+    );
+
+    return false;
+  }
+
+
+  /*
+    Update memory only after Local Storage succeeds.
+  */
+
+  skinState = normalizeSkinState(
+    userState.skin
+  ) || {};
+
+
+  refreshUserCurrency();
+
+  renderSkins();
+
+  refreshSkinAffordability();
+
+  return true;
+}
+
+
+/* =========================================================
+   CURRENCY META
+   ========================================================= */
+
+function currencyMeta(cur){
+
+  return cur === "diamonds"
+
+    ?{
+      cls:"diamond",
+      icon:"picture_resource/icon/dimon.png",
+      emoji:"◆"
+    }
+
+    :{
+      cls:"coin",
+      icon:"picture_resource/icon/coin.png",
+      emoji:"●"
+    };
+}
+
+
+/* =========================================================
+   SKIN IMAGE FALLBACK
+   ========================================================= */
+
+function imgFallbackHtml(
+  icon,
+  emoji,
+  name
+){
+
+  const fallback = emoji || "🎁";
+
+  return icon
+
+    ?'<img class="item-img" src="' +
+      icon +
+      '" alt="' +
+      name +
+      '" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'div\'),{textContent:\'' +
+      fallback +
+      '\',style:\'font-size:30px\'}))"/>'
+
+    :'<div style="font-size:30px">' +
+      fallback +
+      '</div>';
+}
+
+
+/* =========================================================
+   PRICE HTML
+   ========================================================= */
+
+function skinPriceBtnInner(price){
+
+  const meta = currencyMeta(price.currency);
+
+  return(
+    '<img class="btn-price-icon" src="' +
+    meta.icon +
+    '" alt="" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'' +
+    meta.emoji +
+    '\',style:\'font-size:12px\'}))"/>' +
+    '<span>' +
+    fmt(price.amount) +
+    '</span>'
+  );
+}
+
+
+function powerPriceHtml(price){
+
+  const meta = currencyMeta(price.currency);
+
+  return(
+    '<img class="power-card-price-icon" src="' +
+    meta.icon +
+    '" alt="" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'' +
+    meta.emoji +
+    '\',style:\'font-size:12px\'}))"/>' +
+    '<span>' +
+    fmt(price.amount) +
+    '</span>'
+  );
+}
+
+
+function diamondPriceHtml(price){
+
+  const meta = currencyMeta(price.currency);
+
+  return(
+    '<img class="diamond-card-price-icon" src="' +
+    meta.icon +
+    '" alt="" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'' +
+    meta.emoji +
+    '\',style:\'font-size:12px\'}))"/>' +
+    '<span>' +
+    fmt(price.amount) +
+    '</span>'
+  );
+}
+
+
+/* =========================================================
+   CARD CREATION
+   ========================================================= */
+
+function makeCard(cls,id,html){
+
+  const card = document.createElement("div");
+
+  card.className = cls;
+
+  card.dataset.itemId = id;
+
+  card.innerHTML = html;
+
+  return card;
+}
+
+
+/* =========================================================
+   BUTTON LOADING
+   ========================================================= */
+
+function setSkinButtonLoading(btn){
+
+  if(!btn){
+    return;
+  }
+
+  btn.disabled = true;
+
+  btn.classList.add("is-loading");
+
+  btn.setAttribute("aria-busy","true");
+
+  btn.innerHTML =
+    '<span class="btn-spinner" aria-hidden="true"></span>';
+}
+
+
+function setPowerButtonLoading(btn){
+
+  if(!btn){
+    return;
+  }
+
+  btn.disabled = true;
+
+  btn.classList.add("is-loading");
+
+  btn.setAttribute("aria-busy","true");
+
+  btn.innerHTML =
+    '<span class="power-card-spinner" aria-hidden="true"></span>';
+}
+
+
+function setDiamondButtonLoading(btn){
+
+  if(!btn){
+    return;
+  }
+
+  btn.disabled = true;
+
+  btn.classList.add("is-loading");
+
+  btn.setAttribute("aria-busy","true");
+
+  btn.innerHTML =
+    '<span class="diamond-card-spinner" aria-hidden="true"></span>';
+}
+
+
+/* =========================================================
+   POWER CARD BUILDER
+   ========================================================= */
+
+function buildPowerCard(power){
+
+  const qty = getPowerQty(power.id);
+
+  const full = qty >= POWER_MAX;
+
+  /*
+    The button is never rendered with the native "disabled"
+    attribute here. Whether a purchase is currently allowed is
+    decided by refreshPowerAffordability() and enforced in
+    handleBuyPower(); the button always keeps its normal look.
+  */
+
+  const card = makeCard(
+    "power-card",
+    power.id,
+
+    '<div class="power-card-image-wrap">' +
+
+      '<img' +
+        ' class="power-card-image"' +
+        ' src="' + power.icon + '"' +
+        ' alt="' + power.name + '"' +
+        ' loading="lazy"' +
+        ' onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'div\'),{textContent:\'' +
+        power.emoji +
+        '\',className:\'power-card-fallback\'}))"' +
+      '/>' +
+
+    '</div>' +
+
+    '<div class="power-card-content">' +
+
+      '<div class="power-card-name-row">' +
+
+        '<div class="power-card-name">' +
+          power.name +
+        '</div>' +
+
+        '<div class="power-card-counter' +
+          (full ? ' is-full' : '') +
+        '">' +
+          String(qty) +
+        '</div>' +
+
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="power-card-action">' +
+
+      '<button' +
+        ' type="button"' +
+        ' class="power-card-button"' +
+        ' data-buy-power="' + power.id + '"' +
+      '>' +
+
+        powerPriceHtml(power.price) +
+
+      '</button>' +
+
+    '</div>'
+  );
+
+
+  const btn = card.querySelector("[data-buy-power]");
+
+  if(btn){
+
+    btn.addEventListener("click",function(e){
+
+      handleBuyPower(
+        e.currentTarget.dataset.buyPower,
+        e.currentTarget
+      );
+
+    });
+
+  }
+
+  return card;
+}
+
+
+/* =========================================================
+   DIAMOND CARD BUILDER
+   ========================================================= */
+
+function buildDiamondCard(offer){
+
+  const card = makeCard(
+    "diamond-card",
+    offer.id,
+
+    '<div class="diamond-card-image-wrap">' +
+
+      '<img' +
+        ' class="diamond-card-image"' +
+        ' src="' + offer.image + '"' +
+        ' alt="' + fmt(offer.diamonds) + ' Diamonds"' +
+        ' loading="lazy"' +
+        ' draggable="false"' +
+        ' onerror="this.onerror=null;this.classList.add(\'is-failed\')"' +
+      '/>' +
+
+    '</div>' +
+
+    '<div class="diamond-card-content">' +
+
+      '<div class="diamond-card-amount">' +
+        fmt(offer.diamonds) +
+        ' Diamonds' +
+      '</div>' +
+
+      '<div class="diamond-card-label">' +
+        'Diamond Package' +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="diamond-card-action">' +
+
+      '<button' +
+        ' type="button"' +
+        ' class="diamond-card-button"' +
+        ' data-buy-diamond="' + offer.id + '"' +
+      '>' +
+
+        diamondPriceHtml({
+          amount:offer.coins,
+          currency:"coins"
+        }) +
+
+      '</button>' +
+
+    '</div>'
+  );
+
+
+  const btn = card.querySelector("[data-buy-diamond]");
+
+  if(btn){
+
+    btn.addEventListener("click",function(e){
+
+      handleBuyDiamonds(
+        e.currentTarget.dataset.buyDiamond,
+        e.currentTarget
+      );
+
+    });
+
+  }
+
+  return card;
+}
+
+
+/* =========================================================
+   SKIN CARD BUILDER
+   ========================================================= */
+
+function buildSkinCard(skin){
+
+  const status = getSkinStatus(skin.name);
+
+  const owned =
+    status === "owned" ||
+    status === "applied";
+
+  const applied = status === "applied";
+
+  let btnClass = "buy-btn";
+
+  let btnDisabled = false;
+
+  let btnAction;
+
+  let btnInner;
+
+
+  if(!owned){
+
+    if(skin.price.currency === "diamonds"){
+
+      btnClass += " diamond-buy";
+    }
+
+    btnAction = "buy";
+
+    btnInner = skinPriceBtnInner(skin.price);
+
+  }else if(applied){
+
+    btnClass += " applied-btn";
+
+    btnDisabled = true;
+
+    btnAction = "applied";
+
+    btnInner = "APPLIED";
+
+  }else{
+
+    btnClass += " apply-btn";
+
+    btnAction = "apply";
+
+    btnInner = "APPLY";
+  }
+
+
+  const card = makeCard(
+
+    "item-card" +
+      (owned ? " owned" : "") +
+      (applied ? " applied" : ""),
+
+    skin.id,
+
+    '<div class="item-img-wrap">' +
+
+      imgFallbackHtml(
+        skin.icon,
+        skin.emoji,
+        skin.name
+      ) +
+
+    '</div>' +
+
+    '<div class="item-name">' +
+      skin.name +
+    '</div>' +
+
+    '<div class="item-footer">' +
+
+      '<button class="' +
+        btnClass +
+        '" data-skin-action="' +
+        btnAction +
+        '" data-skin-id="' +
+        skin.id +
+        '"' +
+
+        (btnDisabled ? " disabled" : "") +
+
+      '>' +
+
+        btnInner +
+
+      '</button>' +
+
+    '</div>'
+  );
+
+
+  const btn = card.querySelector("[data-skin-action]");
+
+  if(btn){
+
+    btn.addEventListener("click",function(e){
+
+      const action = e.currentTarget.dataset.skinAction;
+
+      const id = e.currentTarget.dataset.skinId;
+
+      if(action === "buy"){
+
+        handleBuySkin(id,e.currentTarget);
+
+      }else if(action === "apply"){
+
+        handleApplySkin(id,e.currentTarget);
+      }
+
+    });
+
+  }
+
+  return card;
+}
+
+
+/* =========================================================
+   DOM REFERENCES
+   ========================================================= */
+
+const $ = function(id){
+
+  return document.getElementById(id);
+};
+
+const shopGrid = $("shopGrid");
+
+const skinScroll = $("skinScroll");
+
+const powerGrid = $("powerGrid");
+
+const shopLoading = $("shopLoading");
+
+const shopScrollEl = $("shopScroll");
+
+
+/* =========================================================
+   POWER RENDERING
+   ========================================================= */
+
+function renderPowers(){
+
+  if(!powerGrid){
+    return;
+  }
+
+  powerGrid.innerHTML = "";
+
+  POWERS.forEach(function(power){
+
+    powerGrid.appendChild(
+      buildPowerCard(power)
+    );
+
+  });
+
+  refreshPowerAffordability();
+}
+
+
+/* =========================================================
+   SKIN RENDERING
+   ========================================================= */
+
+function renderSkins(){
+
+  if(!skinScroll){
+    return;
+  }
+
+  skinScroll.innerHTML = "";
+
+  SKINS.forEach(function(skin){
+
+    skinScroll.appendChild(
+      buildSkinCard(skin)
+    );
+
+  });
+
+  refreshSkinAffordability();
+}
+
+
+/* =========================================================
+   DIAMOND RENDERING
+   ========================================================= */
+
+function renderDiamonds(){
+
+  if(!shopGrid){
+    return;
+  }
+
+  shopGrid.innerHTML = "";
+
+  DIAMOND_OFFERS.forEach(function(offer){
+
+    shopGrid.appendChild(
+      buildDiamondCard(offer)
+    );
+
+  });
+
+  if(shopLoading){
+
+    shopLoading.classList.add("hidden");
+  }
+
+  shopGrid.classList.remove("hidden");
+
+  refreshDiamondAffordability();
+}
+
+
+/* =========================================================
+   COMPLETE RENDERING
+   ========================================================= */
+
+function renderAll(){
+
+  renderPowers();
+
+  renderSkins();
+
+  renderDiamonds();
+
+  renderCoinHud();
+
+  renderDiamondHud();
+
+  refreshAffordability();
+}
+
+
+/* =========================================================
+   FILTER
+   ========================================================= */
+
+function applyFilter(filter){
+
+  const map = {
+
+    power:"powersSection",
+    skin:"skinsSection",
+    diamond:"diamondsSection"
+
+  };
+
+  const targetId = map[filter] || "powersSection";
+
+  Object.keys(map).forEach(function(k){
+
+    const el = document.getElementById(map[k]);
+
+    if(el){
+
+      el.classList.toggle(
+        "hidden",
+        map[k] !== targetId
+      );
+    }
+
+  });
+
+  document.querySelectorAll(".filter-btn").forEach(function(btn){
+
+    btn.classList.toggle(
+      "active",
+      btn.dataset.filter === filter
+    );
+
+  });
+
+  if(shopScrollEl){
+
+    shopScrollEl.scrollTop = 0;
+  }
+}
+
+
+function initFilters(){
+
+  document.querySelectorAll(".filter-btn").forEach(function(btn){
+
+    btn.addEventListener("click",function(){
+
+      applyFilter(btn.dataset.filter);
+
+    });
+
+  });
+
+  applyFilter("power");
+}
+
+
+/* =========================================================
+   BACKEND API
+   ========================================================= */
+
+async function callBackendAPI(
+  endpoint,
+  payload
+){
+
+  if(
+    !firebaseUser ||
+    !firebaseUser.uid
+  ){
+
+    console.warn(
+      "Backend request blocked — no Firebase user."
+    );
+
+    return false;
+  }
+
+  if(
+    !endpoint ||
+    typeof endpoint !== "string"
+  ){
+
+    return false;
+  }
+
+  try{
+
+    const idToken = await firebaseUser.getIdToken(true);
+
+    const response = await fetch(
+      endpoint,
+      {
+        method:"POST",
+
+        headers:{
+
+          "Content-Type":"application/json",
+
+          "Authorization":"Bearer " + idToken
+
+        },
+
+        body:JSON.stringify(payload || {})
+      }
+    );
+
+    let result = null;
+
+    try{
+
+      result = await response.json();
+
+    }catch(jsonError){
+
+      console.error(
+        "Backend returned invalid JSON:",
+        jsonError
+      );
+
+      return false;
+    }
+
+    if(
+      response.ok &&
+      result &&
+      result.success === true
+    ){
+
+      return true;
+    }
+
+    console.warn(
+      "Backend operation rejected:",
+      {
+        status:response.status,
+        result:result
+      }
+    );
+
+    return false;
+
+  }catch(error){
+
+    console.error(
+      "Backend API request failed:",
+      error
+    );
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   CURRENCY CHECK
+   ========================================================= */
+
+function haveCurrency(cur){
+
+  const data = getUserData() || {};
+
+  const field =
+    cur === "diamonds"
+      ? "diamond"
+      : "coin";
+
+  const value = data[field];
+
+  return isValidNumber(value)
+    ? value
+    : 0;
+}
+
+
+/* =========================================================
+   PURCHASE ELIGIBILITY
+   ========================================================= */
+
+/*
+  Purchase buttons ALWAYS keep their normal, active look.
+
+  When a purchase is not allowed the button is NOT given the native
+  "disabled" attribute (which would apply the grey/faded :disabled
+  styling). Instead it carries aria-disabled="true", which has no
+  visual effect, and every click handler re-validates the purchase
+  in JavaScript before doing anything. A click, a keyboard
+  activation or a programmatic .click() on a restricted button is
+  therefore ignored.
+
+  The native "disabled" attribute is still used for the short
+  loading state of a purchase that is already running (existing
+  loading animation) and for the existing APPLIED indicator.
+*/
+
+function setPurchaseAllowed(btn,allowed){
+
+  if(!btn){
+    return;
+  }
+
+  btn.disabled = false;
+
+  if(allowed){
+
+    btn.removeAttribute("aria-disabled");
+
+  }else{
+
+    btn.setAttribute("aria-disabled","true");
+  }
+}
+
+
+function canBuyPower(power){
+
+  return(
+    !!firebaseUser &&
+    !powerPurchaseBusy &&
+    getPowerQty(power.id) < POWER_MAX &&
+    haveCurrency(power.price.currency) >= power.price.amount
+  );
+}
+
+
+function canBuyDiamond(offer){
+
+  return(
+    !!firebaseUser &&
+    !diamondPurchaseBusy &&
+    haveCurrency("coins") >= offer.coins
+  );
+}
+
+
+function canBuySkin(skin){
+
+  return(
+    !!firebaseUser &&
+    !skinPurchaseBusy &&
+    !ownsSkin(skin.id) &&
+    haveCurrency(skin.price.currency) >= skin.price.amount
+  );
+}
+
+
+/* =========================================================
+   POWER AFFORDABILITY
+   ========================================================= */
+
+function refreshPowerAffordability(){
+
+  if(!powerGrid){
+    return;
+  }
+
+  POWERS.forEach(function(power){
+
+    const card = powerGrid.querySelector(
+      '.power-card[data-item-id="' +
+      power.id +
+      '"]'
+    );
+
+    if(!card){
+      return;
+    }
+
+    const btn = card.querySelector(
+      ".power-card-button"
+    );
+
+    const counter = card.querySelector(
+      ".power-card-counter"
+    );
+
+    if(!btn){
+      return;
+    }
+
+    const qty = getPowerQty(power.id);
+
+    const full = qty >= POWER_MAX;
+
+    if(counter){
+
+      counter.textContent = String(qty);
+
+      counter.classList.toggle(
+        "is-full",
+        full
+      );
+    }
+
+    if(!btn.classList.contains("is-loading")){
+
+      setPurchaseAllowed(btn,canBuyPower(power));
+    }
+
+  });
+}
+
+
+/* =========================================================
+   DIAMOND AFFORDABILITY
+   ========================================================= */
+
+function refreshDiamondAffordability(){
+
+  if(!shopGrid){
+    return;
+  }
+
+  DIAMOND_OFFERS.forEach(function(offer){
+
+    const card = shopGrid.querySelector(
+      '.diamond-card[data-item-id="' +
+      offer.id +
+      '"]'
+    );
+
+    if(!card){
+      return;
+    }
+
+    const btn = card.querySelector(
+      ".diamond-card-button"
+    );
+
+    if(!btn){
+      return;
+    }
+
+    if(!btn.classList.contains("is-loading")){
+
+      setPurchaseAllowed(btn,canBuyDiamond(offer));
+    }
+
+  });
+}
+
+
+/* =========================================================
+   SKIN AFFORDABILITY
+   ========================================================= */
+
+function refreshSkinAffordability(){
+
+  if(!skinScroll){
+    return;
+  }
+
+  SKINS.forEach(function(skin){
+
+    const card = skinScroll.querySelector(
+      '.item-card[data-item-id="' +
+      skin.id +
+      '"]'
+    );
+
+    if(!card){
+      return;
+    }
+
+    const btn = card.querySelector("[data-skin-action]");
+
+    if(
+      btn &&
+      btn.dataset.skinAction === "buy"
+    ){
+
+      if(!btn.classList.contains("is-loading")){
+
+        setPurchaseAllowed(btn,canBuySkin(skin));
+      }
+
+    }
+
+  });
+}
+
+
+/* =========================================================
+   AFFORDABILITY
+   ========================================================= */
+
+function refreshAffordability(){
+
+  refreshPowerAffordability();
+
+  refreshDiamondAffordability();
+
+  refreshSkinAffordability();
+}
+
+
+/* =========================================================
+   POWER PURCHASE
+   ========================================================= */
+
+async function handleBuyPower(
+  powerId,
+  btn
+){
+
+  if(powerPurchaseBusy){
+    return;
+  }
+
+  if(!firebaseUser){
+    return;
+  }
+
+  const power = POWERS.find(function(item){
+
+    return item.id === powerId;
+
+  });
+
+  if(!power){
+    return;
+  }
+
+  const currentQty = getPowerQty(powerId);
+
+  if(currentQty >= POWER_MAX){
+    return;
+  }
+
+  if(
+    haveCurrency(power.price.currency) <
+    power.price.amount
+  ){
+
+    return;
+  }
+
+  powerPurchaseBusy = true;
+
+  refreshPowerAffordability();
+
+  setPowerButtonLoading(btn);
+
+  try{
+
+    const ok = await callBackendAPI(
+      POWER_PURCHASE_URL,
+      {
+        powerId:powerId
+      }
+    );
+
+    if(ok){
+
+      await loadUserStateFromFirebase(firebaseUser);
+    }
+
+    renderPowers();
+
+    refreshUserCurrency();
+
+    refreshPowerAffordability();
+
+  }catch(error){
+
+    console.error(
+      "Power purchase flow failed:",
+      error
+    );
+
+    renderPowers();
+
+  }finally{
+
+    powerPurchaseBusy = false;
+
+    refreshPowerAffordability();
+
+  }
+}
+
+
+/* =========================================================
+   DIAMOND PURCHASE
+   ========================================================= */
+
+async function handleBuyDiamonds(
+  offerId,
+  btn
+){
+
+  if(diamondPurchaseBusy){
+    return;
+  }
+
+  if(!firebaseUser){
+    return;
+  }
+
+  const offer = DIAMOND_OFFERS.find(function(item){
+
+    return item.id === offerId;
+
+  });
+
+  if(!offer){
+    return;
+  }
+
+  if(haveCurrency("coins") < offer.coins){
+    return;
+  }
+
+  diamondPurchaseBusy = true;
+
+  refreshDiamondAffordability();
+
+  setDiamondButtonLoading(btn);
+
+  try{
+
+    const ok = await callBackendAPI(
+      DIAMOND_PURCHASE_URL,
+      {
+        offerId:offerId
+      }
+    );
+
+    if(ok){
+
+      await loadUserStateFromFirebase(firebaseUser);
+    }
+
+    refreshUserCurrency();
+
+    renderDiamonds();
+
+    refreshDiamondAffordability();
+
+  }catch(error){
+
+    console.error(
+      "Diamond purchase flow failed:",
+      error
+    );
+
+    renderDiamonds();
+
+  }finally{
+
+    diamondPurchaseBusy = false;
+
+    refreshDiamondAffordability();
+
+  }
+}
+
+
+/* =========================================================
+   SKIN PURCHASE
+   ========================================================= */
+
+/*
+  Sequence:
+
+  1. Validate Skin.
+  2. Validate balance.
+  3. Obtain Firebase ID token.
+  4. Send existing backend request.
+  5. Wait for backend confirmation.
+  6. Read latest Firestore user document.
+  7. Validate Firestore Skin data.
+  8. Update Local Storage.
+  9. Refresh Shop UI.
+
+  No optimistic Local Storage purchase update.
+*/
+
+async function handleBuySkin(
+  skinId,
+  btn
+){
+
+  if(skinPurchaseBusy){
+    return;
+  }
+
+  if(!firebaseUser){
+    return;
+  }
+
+  const skin = SKINS.find(function(item){
+
+    return item.id === skinId;
+
+  });
+
+  if(!skin){
+    return;
+  }
+
+  if(ownsSkin(skinId)){
+    return;
+  }
+
+  if(
+    haveCurrency(skin.price.currency) <
+    skin.price.amount
+  ){
+
+    return;
+  }
+
+  skinPurchaseBusy = true;
+
+  refreshSkinAffordability();
+
+  setSkinButtonLoading(btn);
+
+  try{
+
+    /*
+      Existing endpoint and request format preserved.
+    */
+
+    const backendSuccess = await callBackendAPI(
+      SKIN_PURCHASE_URL,
+      {
+        skinId:skinId
+      }
+    );
+
+
+    /*
+      Backend failure:
+      Do not modify Skin or currency Local Storage.
+    */
+
+    if(!backendSuccess){
+
+      console.warn(
+        "Skin purchase failed. Local cache preserved."
+      );
+
+      return;
+    }
+
+
+    /*
+      Backend success:
+      Read latest Firestore data before updating cache.
+    */
+
+    const synchronized =
+      await synchronizeSkinAfterBackend(firebaseUser);
+
+
+    if(!synchronized){
+
+      console.warn(
+        "Backend purchase succeeded, but Firestore synchronization failed. Existing cache preserved."
+      );
+    }
+
+  }catch(error){
+
+    console.error(
+      "Skin purchase flow failed:",
+      error
+    );
+
+  }finally{
+
+    skinPurchaseBusy = false;
+
+    renderSkins();
+
+    refreshUserCurrency();
+
+    refreshSkinAffordability();
+
+  }
+}
+
+
+/* =========================================================
+   SKIN APPLY
+   ========================================================= */
+
+/*
+  Applying a Skin follows the same safe sequence.
+
+  Local Storage is never changed before backend
+  confirmation and successful Firestore synchronization.
+*/
+
+async function handleApplySkin(
+  skinId,
+  btn
+){
+
+  if(skinPurchaseBusy){
+    return;
+  }
+
+  if(!firebaseUser){
+    return;
+  }
+
+  const skin = SKINS.find(function(item){
+
+    return item.id === skinId;
+
+  });
+
+  if(!skin){
+    return;
+  }
+
+  const status = getSkinStatus(skin.name);
+
+  /*
+    Only an already purchased Skin can be applied.
+  */
+
+  if(status !== "owned"){
+    return;
+  }
+
+  skinPurchaseBusy = true;
+
+  refreshSkinAffordability();
+
+  setSkinButtonLoading(btn);
+
+  try{
+
+    /*
+      Existing endpoint and request format preserved.
+    */
+
+    const backendSuccess = await callBackendAPI(
+      SKIN_APPLY_URL,
+      {
+        skinId:skinId
+      }
+    );
+
+
+    /*
+      Backend failure:
+      Existing applied Skin remains unchanged locally.
+    */
+
+    if(!backendSuccess){
+
+      console.warn(
+        "Skin apply failed. Local cache preserved."
+      );
+
+      return;
+    }
+
+
+    /*
+      Only after successful backend confirmation,
+      fetch and validate latest Firestore Skin data.
+    */
+
+    const synchronized =
+      await synchronizeSkinAfterBackend(firebaseUser);
+
+
+    if(!synchronized){
+
+      console.warn(
+        "Backend apply succeeded, but Firestore synchronization failed. Existing cache preserved."
+      );
+    }
+
+  }catch(error){
+
+    console.error(
+      "Skin apply flow failed:",
+      error
+    );
+
+  }finally{
+
+    skinPurchaseBusy = false;
+
+    renderSkins();
+
+    refreshSkinAffordability();
+
+  }
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+const backBtn = document.getElementById("backBtn");
+
+if(backBtn){
+
+  backBtn.addEventListener("click",function(){
+
+    if(
+      document.referrer &&
+      history.length > 1
+    ){
+
+      history.back();
+
+    }else{
+
+      window.location.href = "home.html";
+    }
+
+  });
+}
+
+
+/* =========================================================
+   INITIAL LOCAL STORAGE RENDER
+   ========================================================= */
+
+/*
+  This happens immediately.
+
+  Firebase authentication and Firestore are not awaited.
+
+  Existing cached currency, Skin and Power data
+  are available for the first render.
+*/
+
+try{
+
+  const initialData = getUserData() || {};
+
+  coin = getLocalCoin();
+
+  diamond = getLocalDiamond();
+
+  skinState = normalizeSkinState(
+    initialData.skin
+  ) || {};
+
+
+  renderCoinHud();
+
+  renderDiamondHud();
+
+  renderAll();
+
+  initFilters();
+
+}catch(error){
+
+  console.error(
+    "Shop initial render failed:",
+    error
+  );
+
+}
+
+
+/* =========================================================
+   FIREBASE AUTHENTICATION
+   ========================================================= */
+
+/*
+  Firebase is used after the initial cached rendering.
+
+  A successful authentication triggers Firestore sync.
+
+  A failed Firestore read never destroys existing cache.
+
+  Signing out does not delete cached Skin information.
+*/
+
+onAuthStateChanged(
+  auth,
+  async function(user){
+
+    firebaseUser = user || null;
+
+    if(user){
+
+      try{
+
+        await loadUserStateFromFirebase(user);
+
+      }catch(error){
+
+        console.error(
+          "Failed to load Firebase user state:",
+          error
+        );
+      }
+
+    }
+
+    /*
+      If the user is signed out, retain cached Skin,
+      coin, diamond and Power information.
+
+      Only update the in-memory authentication state.
+    */
+
+    refreshUserCurrency();
+
+    renderPowers();
+
+    renderSkins();
+
+    renderDiamonds();
+
+    refreshAffordability();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
